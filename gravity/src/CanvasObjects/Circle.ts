@@ -1,21 +1,30 @@
 import CanvasObject from "./CanvasObject";
 import { hasDrawStrategy, DrawFullCircle } from "../Strategies/DrawStrategy";
 import { hasUpdateStrategy, UpdateFullCircle } from "../Strategies/UpdateStrategy";
+import ObjectStore from "../Utils/ObjectStore";
+import hasObjectType from "./Interfaces/Interfaces";
+import { PossibleObjectTypes } from "../Utils/ObjectStore/Interfaces";
 interface ICircle {
     x: number;
     y: number;
     radius: number;
     color: string;
-    c: CanvasRenderingContext2D;
 }
 
-class Circle extends CanvasObject implements hasDrawStrategy, hasUpdateStrategy {
+class Circle extends CanvasObject implements hasDrawStrategy, hasUpdateStrategy, hasObjectType {
+    uuid: string;
     drawStrategy: DrawFullCircle;
     updateStrategy: UpdateFullCircle;
     radius: number;
+    objectType: PossibleObjectTypes = "Circle";
 
-    constructor({ x, y, color, c, radius }: ICircle) {
-        super({ x, y, color, c });
+    constructor({ x, y, color, radius }: ICircle) {
+        super({ x, y, color });
+        const uuid = ObjectStore.store({
+            objectType: this.objectType,
+            objectProperties: { x, y, color, radius },
+        });
+        this.uuid = uuid;
         this.radius = radius;
         this.drawStrategy = new DrawFullCircle();
         this.updateStrategy = new UpdateFullCircle();
@@ -24,4 +33,4 @@ class Circle extends CanvasObject implements hasDrawStrategy, hasUpdateStrategy 
 
 export default Circle;
 
-export { ICircle };
+export { Circle, ICircle };

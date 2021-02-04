@@ -20,8 +20,8 @@ class UpdateFullCircle implements canUpdate {
         this.drawStrategy = new DrawFullCircle();
     }
 
-    update({ c, x, y, radius, color }: ICircle): any {
-        this.drawStrategy.draw({ c, x: x + this.x, y: y + this.y, radius, color });
+    update({ x, y, radius, color }: ICircle): any {
+        this.drawStrategy.draw({ x: x + this.x, y: y + this.y, radius, color });
 
         this.y++;
     }

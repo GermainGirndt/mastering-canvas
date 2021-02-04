@@ -1,4 +1,5 @@
 import { ICircle } from "../CanvasObjects/Circle";
+import { c } from "../Utils/functions";
 
 interface canDraw {
     draw({}: any): void;
@@ -9,7 +10,7 @@ interface hasDrawStrategy {
 }
 
 class DrawFullCircle implements canDraw {
-    draw({ c, x, y, radius, color }: ICircle): void {
+    draw({ x, y, radius, color }: ICircle): void {
         c.beginPath();
         c.arc(x, y, radius, 0, Math.PI * 2, false);
         c.fillStyle = color;
