@@ -4,6 +4,7 @@ import { hasUpdateStrategy, UpdateFullCircle } from "../Strategies/UpdateStrateg
 import ObjectStore from "../Utils/ObjectStore";
 import hasObjectType from "./Interfaces/Interfaces";
 import { PossibleObjectTypes } from "../Utils/ObjectStore/Interfaces";
+import { EventEmitter } from "@angular/core";
 interface ICircle {
     x: number;
     y: number;
@@ -17,17 +18,27 @@ class Circle extends CanvasObject implements hasDrawStrategy, hasUpdateStrategy,
     updateStrategy: UpdateFullCircle;
     radius: number;
     objectType: PossibleObjectTypes = "Circle";
+    eventEmitter: EventEmitter<any>;
 
     constructor({ x, y, color, radius }: ICircle) {
         super({ x, y, color });
-        const uuid = ObjectStore.store({
+        const { uuid, eventEmitter } = ObjectStore.store({
+            x,
+            y,
+            color,
+            radius,
             objectType: this.objectType,
-            objectProperties: { x, y, color, radius },
         });
         this.uuid = uuid;
         this.radius = radius;
+        this.eventEmitter = eventEmitter;
         this.drawStrategy = new DrawFullCircle();
         this.updateStrategy = new UpdateFullCircle();
+
+        eventEmitter.subscribe(radius => {
+            console.log(radius);
+            this.radius = radius;
+        });
     }
 }
 

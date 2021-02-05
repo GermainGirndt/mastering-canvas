@@ -18,12 +18,18 @@ class UpdateFullCircle implements canUpdate {
 
     constructor() {
         this.drawStrategy = new DrawFullCircle();
+        // pass params on constructor
     }
 
     update({ x, y, radius, color }: ICircle): any {
+        console.log({ x, y, radius, color });
         this.drawStrategy.draw({ x: x + this.x, y: y + this.y, radius, color });
 
-        this.y++;
+        this.y += 2;
+        if (y > innerHeight || y < 0) {
+            this.y = -this.y;
+            console.log("inverted");
+        }
     }
 }
 

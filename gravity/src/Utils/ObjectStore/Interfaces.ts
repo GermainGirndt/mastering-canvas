@@ -1,3 +1,4 @@
+import { EventEmitter } from "@angular/core";
 import { ICircle } from "../../CanvasObjects/Circle";
 
 interface IStore {
@@ -17,13 +18,13 @@ interface IUpdateRequest {
     objectType?: PossibleObjectTypes;
     objectPropertiesToUpdate: UpdatebleObjectsPropertiesType;
 }
-interface IRegisterRequest {
+interface IRegisterRequest extends StorableObjectsType {
     uuid: string;
     objectType: PossibleObjectTypes;
-    objectProperties: StorableObjectsType;
+    eventEmitter: EventEmitter<any>;
 }
 
-type IStoreRequest = Pick<IRegisterRequest, "objectType" | "objectProperties">;
+type IStoreRequest = Omit<IRegisterRequest, "uuid" | "eventEmitter">;
 
 type StorableObjectsType = ICircle;
 type PossibleObjectTypes = "Circle";
@@ -31,6 +32,7 @@ type PossibleObjectTypes = "Circle";
 interface StoredICircle extends ICircle {
     uuid: string;
     objectType: PossibleObjectTypes;
+    eventEmitter: EventEmitter<any>;
 }
 
 type IStoredObjectsType = StoredICircle;

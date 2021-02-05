@@ -8,30 +8,49 @@ import {
     IStoredObjectsType,
     IRegisterRequest,
     IStoreRequest,
-    PossibleObjectTypes,
 } from "./Interfaces";
 
+interface IEmitters {
+    [globalEvent: string]: EventEmitter<any>;
+}
 class ObjectStorage {
     constructor() {}
 
     private static storage: IStore = {};
 
-    private static register({ uuid, objectType, objectProperties }: IRegisterRequest): void {
-        if (!this.storage[objectType]) throw Error("Type not supported");
+    private static register({ uuid, objectType, ...objectProperties }: IRegisterRequest): void {
+        console.log({ uuid, objectType, ...objectProperties });
 
         const objectContext = { ...objectProperties, objectType, uuid };
 
+        if (!this.storage[objectType]) this.storage[objectType] = [];
         this.storage[objectType].push(objectContext);
     }
 
-    static store({ objectType, objectProperties }: IStoreRequest): string {
+    public static store(objectProperties: IStoreRequest): IRegisterRequest {
         const uuid = uuidv4();
-        this.register({ uuid, objectType, objectProperties });
+        const eventEmitter = new EventEmitter<any>();
 
-        return uuid;
+        const storeRequest = { ...objectProperties, uuid, eventEmitter };
+
+        var counter = 50;
+        function recursiveFunction() {
+            setTimeout(() => {
+                if (counter < 200) {
+                    eventEmitter.emit(counter);
+                    counter += 0.5;
+                    recursiveFunction();
+                }
+            }, 3);
+        }
+        recursiveFunction();
+
+        this.register(storeRequest);
+
+        return storeRequest;
     }
 
-    static get({ uuid, objectType }: IGetRequest): IStoredObjectsType | undefined {
+    public static get({ uuid, objectType }: IGetRequest): IStoredObjectsType | undefined {
         if (objectType) {
             const result = this.storage[objectType].find(object => object.uuid === uuid);
             if (result) return result;
@@ -47,13 +66,13 @@ class ObjectStorage {
         return undefined;
     }
 
-    static getAll({ objectType }: IGetAllRequest): IStore | Array<IStoredObjectsType> {
+    public static getAll({ objectType }: IGetAllRequest): IStore | Array<IStoredObjectsType> {
         if (objectType) return this.storage[objectType];
 
         return this.storage;
     }
 
-    static update({ uuid, objectType, objectPropertiesToUpdate }: IUpdateRequest): IStoredObjectsType {
+    public static update({ uuid, objectType, objectPropertiesToUpdate }: IUpdateRequest): IStoredObjectsType {
         if ("uuid" in objectPropertiesToUpdate) {
             throw Error("Can not update uuid");
         }
@@ -61,11 +80,9 @@ class ObjectStorage {
         const result = this.get({ uuid, objectType });
         if (!result) throw new Error("No object found to update");
 
-        const objectTypeToSearch = objectType ? objectType : result.objectType;
-
         const updatedObject = { ...result, ...objectPropertiesToUpdate };
 
-        this.register({ uuid, objectType: objectTypeToSearch, objectProperties: updatedObject });
+        this.register(updatedObject);
 
         return updatedObject;
     }

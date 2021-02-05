@@ -10,6 +10,10 @@ interface hasDrawStrategy {
 }
 
 class DrawFullCircle implements canDraw {
+    constructor() {
+        // pass params on constructor
+    }
+
     draw({ x, y, radius, color }: ICircle): void {
         c.beginPath();
         c.arc(x, y, radius, 0, Math.PI * 2, false);
