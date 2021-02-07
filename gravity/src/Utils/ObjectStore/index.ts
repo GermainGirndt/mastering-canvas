@@ -1,91 +1,63 @@
 import { EventEmitter } from "@angular/core";
-import { v4 as uuidv4 } from "uuid";
-import {
-    IStore,
-    IGetRequest,
-    IGetAllRequest,
-    IUpdateRequest,
-    IStoredObjectsType,
-    IRegisterRequest,
-    IStoreRequest,
-} from "./Interfaces";
+import { IMakeableObject } from "../ObjectFactory";
+import { IStore, IGetRequest, ICheckIfExistsRequest, IGetAllRequest, IUpdateRequest } from "./Interfaces";
 
-interface IEmitters {
-    [globalEvent: string]: EventEmitter<any>;
-}
-class ObjectStorage {
+export default class ObjectStore {
     constructor() {}
 
     private static storage: IStore = {};
 
-    private static register({ uuid, objectType, ...objectProperties }: IRegisterRequest): void {
-        console.log({ uuid, objectType, ...objectProperties });
-
-        const objectContext = { ...objectProperties, objectType, uuid };
+    private static register(object: IMakeableObject): void {
+        const { objectType } = object;
 
         if (!this.storage[objectType]) this.storage[objectType] = [];
-        this.storage[objectType].push(objectContext);
+        this.storage[objectType].push(object);
     }
 
-    public static store(objectProperties: IStoreRequest): IRegisterRequest {
-        const uuid = uuidv4();
-        const eventEmitter = new EventEmitter<any>();
-
-        const storeRequest = { ...objectProperties, uuid, eventEmitter };
-
-        var counter = 50;
-        function recursiveFunction() {
-            setTimeout(() => {
-                if (counter < 200) {
-                    eventEmitter.emit(counter);
-                    counter += 0.5;
-                    recursiveFunction();
-                }
-            }, 3);
-        }
-        recursiveFunction();
-
-        this.register(storeRequest);
-
-        return storeRequest;
+    public static store(object: IMakeableObject): void {
+        this.register(object);
     }
 
-    public static get({ uuid, objectType }: IGetRequest): IStoredObjectsType | undefined {
+    public static get({ uuid, objectType }: IGetRequest): IMakeableObject {
+        let result;
         if (objectType) {
-            const result = this.storage[objectType].find(object => object.uuid === uuid);
-            if (result) return result;
+            result = this.storage[objectType].find(object => object.uuid === uuid);
         } else {
             for (const propertyType in this.storage) {
-                console.log("called object " + propertyType);
-
-                const result = this.storage[propertyType].find(object => object.uuid === uuid);
-                if (result) return result;
+                result = this.storage[propertyType].find(object => object.uuid === uuid);
             }
         }
-
-        return undefined;
+        if (result) return result;
+        throw new Error("UUID for object doesn't exist");
     }
 
-    public static getAll({ objectType }: IGetAllRequest): IStore | Array<IStoredObjectsType> {
+    private static checkIfExists({ uuid, objectType }: ICheckIfExistsRequest): boolean {
+        const object = this.get({ uuid, objectType });
+        if (object) return true;
+
+        return false;
+    }
+
+    private static getEventEmitterFromObject({ uuid, objectType }: ICheckIfExistsRequest): EventEmitter<any> {
+        const object = this.get({ uuid, objectType });
+
+        const { eventEmitter } = object;
+        return eventEmitter;
+    }
+
+    public static getAll({ objectType }: IGetAllRequest): IStore | Array<IMakeableObject> {
         if (objectType) return this.storage[objectType];
 
         return this.storage;
     }
 
-    public static update({ uuid, objectType, objectPropertiesToUpdate }: IUpdateRequest): IStoredObjectsType {
-        if ("uuid" in objectPropertiesToUpdate) {
-            throw Error("Can not update uuid");
+    public static update({ uuid, objectType, ...restObjectPropertiesToUpdate }: IUpdateRequest): void {
+        if (!uuid) {
+            throw Error("Can not update without uuid");
         }
 
-        const result = this.get({ uuid, objectType });
-        if (!result) throw new Error("No object found to update");
+        const eventEmitter = this.getEventEmitterFromObject({ uuid, objectType });
 
-        const updatedObject = { ...result, ...objectPropertiesToUpdate };
-
-        this.register(updatedObject);
-
-        return updatedObject;
+        eventEmitter.emit({ objectType, ...restObjectPropertiesToUpdate });
     }
 }
-
-export default ObjectStorage;

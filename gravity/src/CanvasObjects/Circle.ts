@@ -1,47 +1,26 @@
-import CanvasObject from "./CanvasObject";
+import CanvasObject, { ICanvasObject, ICanvasObjectRequest } from "./CanvasObject";
 import { hasDrawStrategy, DrawFullCircle } from "../Strategies/DrawStrategy";
 import { hasUpdateStrategy, UpdateFullCircle } from "../Strategies/UpdateStrategy";
-import ObjectStore from "../Utils/ObjectStore";
 import hasObjectType from "./Interfaces/Interfaces";
-import { PossibleObjectTypes } from "../Utils/ObjectStore/Interfaces";
-import { EventEmitter } from "@angular/core";
-interface ICircle {
-    x: number;
-    y: number;
+
+interface ICircleRequest extends ICanvasObjectRequest {
     radius: number;
     color: string;
+    objectType: "Circle";
 }
 
-class Circle extends CanvasObject implements hasDrawStrategy, hasUpdateStrategy, hasObjectType {
-    uuid: string;
+interface ICircle extends ICircleRequest, ICanvasObject {}
+export default class Circle extends CanvasObject implements hasDrawStrategy, hasUpdateStrategy, hasObjectType {
     drawStrategy: DrawFullCircle;
     updateStrategy: UpdateFullCircle;
     radius: number;
-    objectType: PossibleObjectTypes = "Circle";
-    eventEmitter: EventEmitter<any>;
 
-    constructor({ x, y, color, radius }: ICircle) {
-        super({ x, y, color });
-        const { uuid, eventEmitter } = ObjectStore.store({
-            x,
-            y,
-            color,
-            radius,
-            objectType: this.objectType,
-        });
-        this.uuid = uuid;
+    constructor({ uuid, x, y, color, radius, objectType, eventEmitter }: ICircleRequest) {
+        super({ uuid, x, y, color, objectType, eventEmitter });
         this.radius = radius;
-        this.eventEmitter = eventEmitter;
         this.drawStrategy = new DrawFullCircle();
         this.updateStrategy = new UpdateFullCircle();
-
-        eventEmitter.subscribe(radius => {
-            console.log(radius);
-            this.radius = radius;
-        });
     }
 }
 
-export default Circle;
-
-export { Circle, ICircle };
+export { ICircle, ICircleRequest };

@@ -1,13 +1,18 @@
-import CanvasObject from "../CanvasObjects/CanvasObject";
-import Circle from "../CanvasObjects/Circle";
-import { colors } from "./utils";
+import ObjectFactory, { IMakeableObject } from "./ObjectFactory";
+import { colors, randomColor, randomIntFromRange } from "./utils";
 
-console.log(colors);
-
-const objects: Array<CanvasObject> = [];
-function initObjects(): Array<CanvasObject> {
+const objects: Array<IMakeableObject> = [];
+function initObjects(): Array<IMakeableObject> {
     for (let i = 0; i < 1; i++) {
-        const object = new Circle({ x: 750, y: 60, color: "blue", radius: 15 });
+        console.log("Making object: ");
+        const object = ObjectFactory.make({
+            objectType: "Circle",
+            x: 750,
+            y: 60,
+            color: randomColor(),
+            radius: randomIntFromRange({ min: 15, max: 30 }),
+        });
+        console.log("Object made: " + object);
         objects.push(object);
     }
     return objects;

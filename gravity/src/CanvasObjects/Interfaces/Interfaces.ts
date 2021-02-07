@@ -1,5 +1,5 @@
-import { PossibleObjectTypes } from "../../Utils/ObjectStore/Interfaces";
+import { MakeableObjectType } from "../../Utils/ObjectFactory";
 
 export default interface hasObjectType {
-    objectType: PossibleObjectTypes;
+    objectType: MakeableObjectType;
 }

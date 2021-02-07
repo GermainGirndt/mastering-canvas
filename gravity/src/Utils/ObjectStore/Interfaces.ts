@@ -1,52 +1,25 @@
-import { EventEmitter } from "@angular/core";
-import { ICircle } from "../../CanvasObjects/Circle";
+import { MakeableObjectType, IMakeableObject } from "../ObjectFactory";
 
 interface IStore {
-    [object: string]: Array<IStoredObjectsType>;
+    [object: string]: Array<IMakeableObject>;
 }
 interface IGetRequest {
     uuid: string;
-    objectType?: PossibleObjectTypes;
+    objectType?: MakeableObjectType;
+}
+interface ICheckIfExistsRequest {
+    uuid: string;
+    objectType?: MakeableObjectType;
 }
 
 interface IGetAllRequest {
-    objectType?: PossibleObjectTypes;
+    objectType?: MakeableObjectType;
 }
 
-interface IUpdateRequest {
+interface IUpdateRequest extends UpdatebleObjectsPropertiesType {
     uuid: string;
-    objectType?: PossibleObjectTypes;
-    objectPropertiesToUpdate: UpdatebleObjectsPropertiesType;
-}
-interface IRegisterRequest extends StorableObjectsType {
-    uuid: string;
-    objectType: PossibleObjectTypes;
-    eventEmitter: EventEmitter<any>;
 }
 
-type IStoreRequest = Omit<IRegisterRequest, "uuid" | "eventEmitter">;
+type UpdatebleObjectsPropertiesType = Partial<Omit<IMakeableObject, "uuid">>;
 
-type StorableObjectsType = ICircle;
-type PossibleObjectTypes = "Circle";
-
-interface StoredICircle extends ICircle {
-    uuid: string;
-    objectType: PossibleObjectTypes;
-    eventEmitter: EventEmitter<any>;
-}
-
-type IStoredObjectsType = StoredICircle;
-
-type UpdatebleObjectsPropertiesType = Partial<Omit<IStoredObjectsType, "uuid">>;
-
-export {
-    IStore,
-    IGetRequest,
-    IGetAllRequest,
-    IUpdateRequest,
-    IRegisterRequest,
-    PossibleObjectTypes,
-    IStoreRequest,
-    StorableObjectsType,
-    IStoredObjectsType,
-};
+export { IStore, IGetRequest, ICheckIfExistsRequest, IGetAllRequest, IUpdateRequest };

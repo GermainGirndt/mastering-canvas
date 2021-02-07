@@ -17,7 +17,9 @@
     },
     "scripts": {
         "start2": "yarn tsc-watch src/index.ts --outDir ./dist",
-        "start": "yarn webpack"
+        "start": "yarn webpack --config webpack.config.js --mode=development",
+        "dev": "webpack-dev-server --mode development --open",
+        "build": "webpack --config webpack.prod.js"
     },
     "eslintConfig": {},
     "devDependencies": {
