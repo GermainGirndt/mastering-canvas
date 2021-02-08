@@ -17,7 +17,7 @@ interface ICanvasObjectRequest {
     eventEmitter: EventEmitter<any>;
 }
 
-export default class CanvasObject implements ICanvasObject {
+export default abstract class CanvasObject implements ICanvasObject {
     uuid: string;
     x: number;
     y: number;

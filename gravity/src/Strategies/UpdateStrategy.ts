@@ -1,7 +1,8 @@
 import { randomColor, randomIntFromRange, calcDistance, colors } from "../Utils/utils";
 import { ICircle } from "../CanvasObjects/Circle";
-import { DrawFullCircle } from "./DrawStrategy";
+import { BaseDrawStrategy, DrawFullCircleStrategy } from "./DrawStrategy";
 import { EventEmitter } from "@angular/core";
+import { BaseBorderTouchStrategy, BorderTouchReflectionStrategy } from "./BorderTouchStrategy";
 
 interface canUpdate {
     update({}: any): void;
@@ -11,35 +12,60 @@ interface hasUpdateStrategy {
     updateStrategy: canUpdate;
 }
 
-class UpdateFullCircle implements canUpdate {
+abstract class BaseUpdateStrategy implements canUpdate {
     eventEmitter: EventEmitter<any>;
-    drawStrategy: DrawFullCircle;
-    x: number = 0;
-    y: number = 0;
-    maxIt: number = 0;
-    dY: number = 2;
-    dX: number = 2;
-    color: string = randomColor();
+    drawStrategy: BaseDrawStrategy;
+    x: number;
+    y: number;
+    radius: number;
+    dY: number;
+    dX: number;
+    color: string;
+    borderTouchStrategy: BaseBorderTouchStrategy;
 
-    constructor() {
-        this.drawStrategy = new DrawFullCircle();
+    public update(objectProperties: ICircle): void {
+        this.updateStrategyProperties(objectProperties);
+        this.drawStrategy.draw(objectProperties);
+
+        this.applyUpdateStrategy();
+
+        const { eventEmitter } = objectProperties;
+
+        eventEmitter.emit({
+            x: this.x + this.dX,
+            y: this.y + this.dY,
+            radius: this.radius,
+            color: this.color,
+        });
     }
 
-    update({ uuid, x, y, radius, color, eventEmitter, ...rest }: ICircle): any {
-        this.drawStrategy.draw({ uuid, x, y, radius, color, eventEmitter, ...rest });
+    private updateStrategyProperties(objectProperties: any): void {
+        Object.assign(this, objectProperties);
+    }
 
-        if (y + this.dY + radius > innerHeight || y + this.dY - radius < 0) {
-            this.dY = -this.dY;
-            this.color = randomColor();
+    protected abstract applyUpdateStrategy(): void;
+}
+
+class UpdateFullCircleStrategy extends BaseUpdateStrategy {
+    constructor() {
+        super();
+        this.borderTouchStrategy = new BorderTouchReflectionStrategy();
+        this.drawStrategy = new DrawFullCircleStrategy();
+        this.dY = 2;
+        this.dX = 2;
+        this.color = randomColor();
+    }
+
+    protected applyUpdateStrategy(): void {
+        this.applyBorderChangeStrategy();
+    }
+
+    private applyBorderChangeStrategy() {
+        const changesByBorderTouch = this.borderTouchStrategy.applyBorderTouchStrategy(this);
+        if (changesByBorderTouch) {
+            Object.assign(this, changesByBorderTouch);
         }
-
-        if (x + this.dX + radius > innerWidth || x + this.dX - radius < 0) {
-            this.dX = -this.dX;
-            this.color = randomColor();
-        }
-
-        eventEmitter.emit({ x: x + this.dX, y: y + this.dY, radius, color: this.color, ...rest });
     }
 }
 
-export { canUpdate, UpdateFullCircle, hasUpdateStrategy };
+export { canUpdate, BaseUpdateStrategy, UpdateFullCircleStrategy, hasUpdateStrategy };
