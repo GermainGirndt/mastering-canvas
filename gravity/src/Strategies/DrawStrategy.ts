@@ -24,6 +24,7 @@ class DrawFullCircleStrategy extends BaseDrawStrategy implements canDraw {
         c.fillStyle = color;
         c.fill();
         c.closePath();
+        c.isPointInPath;
     }
 }
 

@@ -13,7 +13,7 @@ interface ICheckIfExistsRequest {
 }
 
 interface IGetAllRequest {
-    objectType?: MakeableObjectType;
+    objectType: MakeableObjectType;
 }
 
 interface IUpdateRequest extends UpdatebleObjectsPropertiesType {

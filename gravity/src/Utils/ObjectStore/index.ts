@@ -45,10 +45,16 @@ export default class ObjectStore {
         return eventEmitter;
     }
 
-    public static getAll({ objectType }: IGetAllRequest): IStore | Array<IMakeableObject> {
-        if (objectType) return this.storage[objectType];
-
+    public static getAll(): IStore {
         return this.storage;
+    }
+
+    public static getAllFromType({ objectType }: IGetAllRequest): Array<IMakeableObject> {
+        if (!objectType) {
+            throw new Error("objectType required!");
+        }
+
+        return this.storage[objectType];
     }
 
     public static update({ uuid, objectType, ...restObjectPropertiesToUpdate }: IUpdateRequest): void {

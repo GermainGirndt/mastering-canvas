@@ -18,8 +18,6 @@ export default class ObjectFactory {
         switch (objectType) {
             case "Circle":
                 object = new Circle({ ...restProperties, objectType, uuid, eventEmitter });
-                console.log("object created: ");
-                console.log(object);
                 break;
             default:
                 throw new Error("Object Type not known");

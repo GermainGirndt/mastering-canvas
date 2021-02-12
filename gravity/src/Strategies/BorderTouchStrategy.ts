@@ -33,6 +33,7 @@ abstract class BaseBorderTouchStrategy {
     protected radius: number;
     protected dY: number;
     protected dX: number;
+    protected color: string;
 
     protected isAnyBorderBeeingCrossed: boolean;
     protected isXBorderBeeingCrossed: boolean;
@@ -96,11 +97,10 @@ class BorderTouchReflectionStrategy extends BaseBorderTouchStrategy implements c
     protected applyBorderTouchConcreteStrategy(): ChangesByBorderTouch | undefined {
         if (this.checkIfAnyBorderIsBeeingCrossedInTheNextFrame()) {
             if (this.isYBorderBeeingCrossed) {
-                console.log("Y border is beeing crossed");
-                return { dY: -this.dY, color: randomColor() };
+                return { dY: -this.dY, color: randomColor(this.color) };
             }
             if (this.isXBorderBeeingCrossed) {
-                return { dX: -this.dX, color: randomColor() };
+                return { dX: -this.dX, color: randomColor(this.color) };
             }
         }
         return undefined;

@@ -11,7 +11,9 @@ interface ICanvasObject extends ICanvasObjectRequest, canDraw, canUpdate {
 interface ICanvasObjectRequest {
     uuid: string;
     x: number;
+    dX: number;
     y: number;
+    dY: number;
     color: string;
     objectType: MakeableObjectType;
     eventEmitter: EventEmitter<any>;
@@ -20,7 +22,9 @@ interface ICanvasObjectRequest {
 export default abstract class CanvasObject implements ICanvasObject {
     uuid: string;
     x: number;
+    dX: number;
     y: number;
+    dY: number;
     color: string;
     objectType: MakeableObjectType;
     eventEmitter: EventEmitter<any>;
