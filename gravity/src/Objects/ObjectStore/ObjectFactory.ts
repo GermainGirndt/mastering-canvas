@@ -1,7 +1,7 @@
 import { EventEmitter } from "@angular/core";
 import { v4 as uuidv4 } from "uuid";
 import Circle, { ICircle, ICircleRequest } from "../CanvasObjects/Circle";
-import ObjectStore from "./ObjectStore";
+import ObjectStore from "./index";
 
 type IMakeableObjectRequest = ICircleRequest;
 type MakeableObjectType = "Circle";

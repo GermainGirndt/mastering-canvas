@@ -1,5 +1,5 @@
-import { ICircle } from "../CanvasObjects/Circle";
-import { c } from "../Utils/functions";
+import { ICircle } from "../Circle";
+import { c } from "../../../Utils/constants";
 
 interface canDraw {
     draw({}: any): void;

@@ -1,7 +1,6 @@
-import { randomColor, randomIntFromRange, calcDistance, colors } from "../Utils/utils";
-import { IMakeableObjectRequest } from "../Utils/ObjectFactory";
-import ObjectStore from "../Utils/ObjectStore";
-import { ICanvasObject } from "../CanvasObjects/CanvasObject";
+import { randomColor, randomIntFromRange, calcDistance } from "../../../Utils/functions";
+import ObjectStore from "../../ObjectStore";
+import { ICanvasObject } from "../CanvasObject";
 
 interface canTouchObject {
     applyObjectTouchStrategy({}: any): void;
@@ -31,6 +30,7 @@ interface applyObjectTouchStrategyRequest {
 
 abstract class BaseObjectTouchStrategy {
     protected uuid: string;
+    protected color: string;
     protected x: number;
     protected y: number;
     protected radius: number;
@@ -69,7 +69,7 @@ abstract class BaseObjectTouchStrategy {
 class ObjectTouchReflectionStrategy extends BaseObjectTouchStrategy implements canTouchObject {
     protected applyObjectTouchConcreteStrategy(): ChangesByObjectTouch | undefined {
         if (this.checkIfObjectsTouch()) {
-            return { dY: -this.dY, dX: -this.dX, color: randomColor() };
+            return { dY: -this.dY, dX: -this.dX, color: randomColor(this.color) };
         }
         return undefined;
     }

@@ -1,8 +1,8 @@
 import CanvasObject, { ICanvasObject, ICanvasObjectRequest } from "./CanvasObject";
-import { hasDrawStrategy, DrawFullCircleStrategy } from "../Strategies/DrawStrategy";
-import { hasUpdateStrategy, UpdateFullCircleStrategy } from "../Strategies/UpdateStrategy";
+import { hasDrawStrategy, DrawFullCircleStrategy } from "./Strategies/DrawStrategy";
+import { hasUpdateStrategy, UpdateFullCircleStrategy } from "./Strategies/UpdateStrategy";
 import hasObjectType from "./Interfaces/Interfaces";
-import { hasObjectTouchStrategy, ObjectTouchReflectionStrategy } from "../Strategies/ObjectTouchStrategy";
+import { hasObjectTouchStrategy, ObjectTouchReflectionStrategy } from "./Strategies/ObjectTouchStrategy";
 
 interface ICircleRequest extends ICanvasObjectRequest {
     radius: number;

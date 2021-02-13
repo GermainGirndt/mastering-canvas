@@ -1,7 +1,7 @@
 import { EventEmitter } from "@angular/core";
-import { canDraw } from "../Strategies/DrawStrategy";
-import { canUpdate } from "../Strategies/UpdateStrategy";
-import { MakeableObjectType } from "../Utils/ObjectFactory";
+import { MakeableObjectType } from "../ObjectStore/ObjectFactory";
+import { canDraw } from "./Strategies/DrawStrategy";
+import { canUpdate } from "./Strategies/UpdateStrategy";
 
 interface ICanvasObject extends ICanvasObjectRequest, canDraw, canUpdate {
     draw(): void;

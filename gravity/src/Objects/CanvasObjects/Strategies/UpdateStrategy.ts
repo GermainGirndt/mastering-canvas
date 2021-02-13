@@ -1,5 +1,5 @@
-import { randomColor, randomIntFromRange, calcDistance, colors } from "../Utils/utils";
-import { ICircle } from "../CanvasObjects/Circle";
+import { randomColor, randomIntFromRange, calcDistance } from "../../../Utils/functions";
+import { ICircle } from "../Circle";
 import { BaseDrawStrategy, DrawFullCircleStrategy } from "./DrawStrategy";
 import { EventEmitter } from "@angular/core";
 import { BaseBorderTouchStrategy, BorderTouchReflectionStrategy } from "./BorderTouchStrategy";

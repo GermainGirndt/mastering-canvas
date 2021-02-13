@@ -1,18 +1,17 @@
-import { mouse, c, canvas } from "./Utils/functions";
-import { objects, initObjects } from "./Utils/initObjects";
-import { isPaused } from "./Utils/utils";
+import { initObjects, callNextFrame } from "./Utils/initObjects";
+import { c, canvas, mouse } from "./Utils/constants";
+import eventListeners from "./Utils/eventListeners";
+import animationController from "./Utils/animationController";
+import ObjectStore from "./Objects/ObjectStore";
 
+eventListeners();
 initObjects();
 
 function animate() {
     requestAnimationFrame(animate);
-    if (!isPaused) {
-        c.clearRect(0, 0, canvas.width, canvas.height);
 
-        c.fillText("CANVAS", mouse.x, mouse.y);
-        objects.forEach(object => {
-            object.update();
-        });
+    if (!animationController.isPaused) {
+        callNextFrame(c, canvas, ObjectStore.getAllAsArray(), mouse);
     }
 }
 

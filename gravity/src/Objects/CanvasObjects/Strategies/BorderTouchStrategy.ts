@@ -1,5 +1,4 @@
-import { randomColor, randomIntFromRange, calcDistance, colors } from "../Utils/utils";
-import { IMakeableObjectRequest } from "../Utils/ObjectFactory";
+import { randomColor, randomIntFromRange, calcDistance } from "../../../Utils/functions";
 
 interface canTouchBorder {
     applyBorderTouchStrategy({}: any): void;

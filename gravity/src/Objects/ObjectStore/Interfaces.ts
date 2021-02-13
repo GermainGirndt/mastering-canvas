@@ -1,8 +1,14 @@
-import { MakeableObjectType, IMakeableObject } from "../ObjectFactory";
+import { IMakeableObject, MakeableObjectType } from "./ObjectFactory";
 
 interface IStore {
-    [object: string]: Array<IMakeableObject>;
+    [object: string]: StoredObject;
 }
+
+interface StoredObject {
+    objects: Array<IMakeableObject>;
+    count: number;
+}
+
 interface IGetRequest {
     uuid: string;
     objectType?: MakeableObjectType;
