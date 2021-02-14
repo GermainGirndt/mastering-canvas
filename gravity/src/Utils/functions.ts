@@ -23,44 +23,47 @@ function calcDistance({ x1, y1, x2, y2 }: IDistance) {
     return Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2));
 }
 
-interface ICheckIfObjectIsInArea {
-    objectX: number;
-    objectY: number;
-    objectRadius: number;
+interface ICheckIfCoordinatesAreInArea {
+    x: number;
+    y: number;
+    coordinateRadius?: number;
     areaX: number;
     areaY: number;
-    areaRadius: number;
+    areaRadius?: number;
 }
 
-function checkIfObjectIsInArea({
-    objectX,
-    objectY,
-    objectRadius,
+function checkIfCoordinatesAreInArea({
+    x,
+    y,
+    coordinateRadius,
     areaX,
     areaY,
     areaRadius,
-}: ICheckIfObjectIsInArea): boolean {
-    const objectMinX = objectX - objectRadius;
-    const objectMaxX = objectX + objectRadius;
-    const objectMinY = objectY - objectRadius;
-    const objectMaxY = objectY + objectRadius;
+}: ICheckIfCoordinatesAreInArea): boolean {
+    const _coordinateRadius = coordinateRadius ? coordinateRadius : 0;
+    const _areaRadius = areaRadius ? areaRadius : 0;
 
-    const areaMinX = areaX - areaRadius;
-    const areaMaxX = areaX + areaRadius;
-    const areaMinY = areaY - areaRadius;
-    const areaMaxY = areaY + areaRadius;
+    const objectMinX = x - _coordinateRadius;
+    const objectMaxX = x + _coordinateRadius;
+    const objectMinY = y - _coordinateRadius;
+    const objectMaxY = y + _coordinateRadius;
+
+    const areaMinX = areaX - _areaRadius;
+    const areaMaxX = areaX + _areaRadius;
+    const areaMinY = areaY - _areaRadius;
+    const areaMaxY = areaY + _areaRadius;
 
     const isNotInAreaX = areaMinX > objectMaxX || areaMaxX < objectMinX;
     const isNotInAreaY = areaMinY > objectMaxY || areaMaxY < objectMinY;
 
-    const isNotInArea = isNotInAreaX && isNotInAreaY;
+    const isNotInArea = isNotInAreaX || isNotInAreaY;
 
     return !isNotInArea;
 }
 
-function getRandomCoordinates(objectRadius: number = 0): Coordinates {
-    const x = randomIntFromRange({ min: 0 + objectRadius, max: innerWidth - objectRadius });
-    const y = randomIntFromRange({ min: 0 + objectRadius, max: innerHeight - objectRadius });
+function getRandomCoordinates(coordinateRadius: number = 0): Coordinates {
+    const x = randomIntFromRange({ min: 0 + coordinateRadius, max: innerWidth - coordinateRadius });
+    const y = randomIntFromRange({ min: 0 + coordinateRadius, max: innerHeight - coordinateRadius });
     return { y, x };
 }
 
@@ -70,10 +73,10 @@ interface ICheckIfAnyAreaIsOccupiedByObject {
 }
 function checkIfAnyAreaIsOccupiedByObject({ areas, object }: ICheckIfAnyAreaIsOccupiedByObject) {
     const isAnyAreaOccupied = areas.some(area => {
-        return checkIfObjectIsInArea({
-            objectX: object.x,
-            objectY: object.y,
-            objectRadius: object.radius,
+        return checkIfCoordinatesAreInArea({
+            x: object.x,
+            y: object.y,
+            coordinateRadius: object.radius,
             areaRadius: area.radius,
             areaX: area.x,
             areaY: area.y,
@@ -85,10 +88,10 @@ function checkIfAnyAreaIsOccupiedByObject({ areas, object }: ICheckIfAnyAreaIsOc
 
 function checkIfObjectsAreOccupingAnyArea({ areas, object }: ICheckIfAnyAreaIsOccupiedByObject) {
     const isAnyAreaOccupied = areas.some(area => {
-        return checkIfObjectIsInArea({
-            objectX: object.x,
-            objectY: object.y,
-            objectRadius: object.radius,
+        return checkIfCoordinatesAreInArea({
+            x: object.x,
+            y: object.y,
+            coordinateRadius: object.radius,
             areaRadius: area.radius,
             areaX: area.x,
             areaY: area.y,
@@ -132,7 +135,7 @@ export {
     randomIntFromRange,
     randomColor,
     calcDistance,
-    checkIfObjectIsInArea,
+    checkIfCoordinatesAreInArea,
     getRandomCoordinates,
     checkIfAnyAreaIsOccupiedByObject,
     checkIfObjectsAreOccupingAnyArea,

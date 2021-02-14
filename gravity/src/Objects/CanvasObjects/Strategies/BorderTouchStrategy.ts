@@ -82,12 +82,12 @@ abstract class BaseBorderTouchStrategy {
     }
 
     protected checkIfLeftBorderIsBeeingCrossedInTheNextFrame(): boolean {
-        this.isLeftBorderBeeingCrossed = this.x + this.dX + this.radius > innerWidth;
+        this.isLeftBorderBeeingCrossed = this.x + this.dX - this.radius < 0;
         return this.isLeftBorderBeeingCrossed;
     }
 
     protected checkIfRightBorderIsBeeingCrossedInTheNextFrame(): boolean {
-        this.isRightBorderBeeingCrossed = this.x + this.dX - this.radius < 0;
+        this.isRightBorderBeeingCrossed = this.x + this.dX + this.radius > innerWidth;
         return this.isRightBorderBeeingCrossed;
     }
 }
@@ -95,11 +95,24 @@ abstract class BaseBorderTouchStrategy {
 class BorderTouchReflectionStrategy extends BaseBorderTouchStrategy implements canTouchBorder {
     protected applyBorderTouchConcreteStrategy(): ChangesByBorderTouch | undefined {
         if (this.checkIfAnyBorderIsBeeingCrossedInTheNextFrame()) {
+            console.log("border crossed");
             if (this.isYBorderBeeingCrossed) {
-                return { dY: -this.dY, color: randomColor(this.color) };
+                let y: number;
+                if (this.isTopBorderBeeingCrossed) {
+                    y = 0 + this.radius - this.dY;
+                } else {
+                    y = innerHeight - this.radius - this.dY;
+                }
+                return { y, dY: -this.dY, color: randomColor(this.color) };
             }
             if (this.isXBorderBeeingCrossed) {
-                return { dX: -this.dX, color: randomColor(this.color) };
+                let x: number;
+                if (this.isLeftBorderBeeingCrossed) {
+                    x = 0 + this.radius - this.dX;
+                } else {
+                    x = innerWidth - this.radius - this.dX;
+                }
+                return { x, dX: -this.dX, color: randomColor(this.color) };
             }
         }
         return undefined;

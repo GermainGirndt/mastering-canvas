@@ -1,7 +1,15 @@
 import { EventEmitter } from "@angular/core";
 import { IMakeableObject } from "./ObjectFactory";
-import { IStore, IGetRequest, ICheckIfExistsRequest, IGetAllRequest, IUpdateRequest } from "./Interfaces";
-
+import {
+    IStore,
+    IGetRequest,
+    IDeleteRequest,
+    ICheckIfExistsRequest,
+    IGetAllRequest,
+    IUpdateRequest,
+} from "./Interfaces";
+import { Coordinates } from "../../Shared/Interfaces";
+import { checkIfCoordinatesAreInArea } from "../../Utils/functions";
 export default class ObjectStore {
     constructor() {}
 
@@ -30,8 +38,8 @@ export default class ObjectStore {
                 result = this.storage[propertyType].objects.find(object => object.uuid === uuid);
             }
         }
-        if (result) return result;
-        throw new Error("UUID for object doesn't exist");
+        if (!result) throw new Error("UUID for object doesn't exist");
+        return result;
     }
 
     public static checkIfExists({ uuid, objectType }: ICheckIfExistsRequest): boolean {
@@ -61,6 +69,25 @@ export default class ObjectStore {
         return objects;
     }
 
+    public static getAllInCoordinates({ x, y }: Coordinates): Array<IMakeableObject> {
+        const objects = this.getAllAsArray();
+
+        console.log({ x, y });
+
+        const allObjectsInCoordinates = objects.filter(object => {
+            const isObjectInArea = checkIfCoordinatesAreInArea({
+                x,
+                y,
+                areaX: object.x,
+                areaY: object.y,
+                areaRadius: object.radius,
+            });
+            return isObjectInArea;
+        });
+
+        return allObjectsInCoordinates;
+    }
+
     public static getAllFromType({ objectType }: IGetAllRequest): Array<IMakeableObject> {
         if (!objectType) {
             throw new Error("objectType required!");
@@ -77,5 +104,33 @@ export default class ObjectStore {
         const eventEmitter = this.getEventEmitterFromObject({ uuid, objectType });
 
         eventEmitter.emit({ objectType, ...restObjectPropertiesToUpdate });
+    }
+
+    public static delete({ uuid, objectType }: IDeleteRequest): void {
+        const deleteOneItem = 1;
+        const noElementsFoundIndex = -1;
+
+        if (objectType) {
+            const indexToDelete = this.storage[objectType].objects.findIndex(object => object.uuid === uuid);
+            this.storage[objectType].objects.splice(indexToDelete, deleteOneItem);
+            this.storageCount--;
+            return;
+        }
+
+        for (const propertyType in this.storage) {
+            const indexToDelete = this.storage[propertyType].objects.findIndex(object => object.uuid === uuid);
+            if (indexToDelete !== noElementsFoundIndex) {
+                this.storage[propertyType].objects.splice(indexToDelete, deleteOneItem);
+                this.storageCount--;
+                return;
+            }
+        }
+    }
+
+    public static deleteMany(objectsToDeleteArray: Array<IDeleteRequest>): void {
+        // to improve
+        objectsToDeleteArray.forEach(object => {
+            this.delete(object);
+        });
     }
 }

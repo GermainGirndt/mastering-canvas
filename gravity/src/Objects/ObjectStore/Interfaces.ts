@@ -13,6 +13,12 @@ interface IGetRequest {
     uuid: string;
     objectType?: MakeableObjectType;
 }
+
+interface IDeleteRequest {
+    uuid: string;
+    objectType?: MakeableObjectType;
+}
+
 interface ICheckIfExistsRequest {
     uuid: string;
     objectType?: MakeableObjectType;
@@ -28,4 +34,4 @@ interface IUpdateRequest extends UpdatebleObjectsPropertiesType {
 
 type UpdatebleObjectsPropertiesType = Partial<Omit<IMakeableObject, "uuid">>;
 
-export { IStore, IGetRequest, ICheckIfExistsRequest, IGetAllRequest, IUpdateRequest };
+export { IStore, IGetRequest, IDeleteRequest, ICheckIfExistsRequest, IGetAllRequest, IUpdateRequest };

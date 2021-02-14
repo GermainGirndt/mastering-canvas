@@ -8,23 +8,23 @@ function initObjects(): void {
         alert("Max ball number reached!");
         return;
     }
-    for (let i = 0; i < 1; i++) {
-        ObjectFactory.make({
-            objectType: "Circle",
-            x: 750,
-            y: 60,
-            color: randomColor(),
-            radius: randomIntFromRange({ min: 15, max: 30 }),
-            dX: 2,
-            dY: 2,
-        });
-    }
+    ObjectFactory.make({
+        objectType: "Circle",
+        x: 50,
+        y: 50,
+        color: randomColor(),
+        // radius: randomIntFromRange({ min: 15, max: 30 }),
+        radius: 50,
+        dX: 2,
+        dY: 2,
+    });
 }
 
-function replaceObjectsOnScreen(): void {
+function relocateObjectsOnScreen(): void {
     const objects: Array<IMakeableObject> = ObjectStore.getAllAsArray();
 
     const areasAlreadyOccupied: Array<Area> = [];
+    const maxTries: number = 20000;
 
     objects.forEach(object => {
         let newCoordinates: Coordinates;
@@ -36,7 +36,7 @@ function replaceObjectsOnScreen(): void {
             Object.assign(object, newCoordinates);
 
             isOccupied = checkIfAnyAreaIsOccupiedByObject({ areas: areasAlreadyOccupied, object });
-        } while (isOccupied && count < 20000);
+        } while (isOccupied && count < maxTries);
 
         areasAlreadyOccupied.push({ ...newCoordinates, radius: object.radius });
     });
@@ -55,4 +55,4 @@ function callNextFrame(
     });
 }
 
-export { initObjects, replaceObjectsOnScreen, callNextFrame };
+export { initObjects, relocateObjectsOnScreen, callNextFrame };
