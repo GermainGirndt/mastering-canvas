@@ -36,10 +36,12 @@ function eventListeners() {
             case " ":
                 // pause
                 animationController.tooglePause();
+                break;
             case "i":
                 // info
                 const objects = ObjectStore.getAll();
                 console.log(objects);
+                break;
         }
     });
 
