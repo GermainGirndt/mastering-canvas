@@ -39,9 +39,12 @@ function eventListeners() {
                 break;
             case "i":
                 // info
-                const objects = ObjectStore.getAll();
-                console.log(objects);
+                animationController.logInfo();
                 break;
+            case "r":
+                ObjectStore.removeAll();
+                animationController.resetAll();
+                initObjects();
         }
     });
 

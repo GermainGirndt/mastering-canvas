@@ -2,7 +2,6 @@ import CanvasObject, { ICanvasObject, ICanvasObjectRequest } from "./CanvasObjec
 import { hasDrawStrategy, DrawFullCircleStrategy } from "./Strategies/DrawStrategy";
 import { hasUpdateStrategy, UpdateFullCircleStrategy } from "./Strategies/UpdateStrategy";
 import hasObjectType from "./Interfaces/Interfaces";
-import { hasObjectTouchStrategy, ObjectTouchReflectionStrategy } from "./Strategies/ObjectTouchStrategy";
 
 interface ICircleRequest extends ICanvasObjectRequest {
     radius: number;
@@ -11,12 +10,9 @@ interface ICircleRequest extends ICanvasObjectRequest {
 }
 
 interface ICircle extends ICircleRequest, ICanvasObject {}
-export default class Circle
-    extends CanvasObject
-    implements hasDrawStrategy, hasUpdateStrategy, hasObjectType, hasObjectTouchStrategy {
+export default class Circle extends CanvasObject implements hasDrawStrategy, hasUpdateStrategy, hasObjectType {
     drawStrategy: DrawFullCircleStrategy;
     updateStrategy: UpdateFullCircleStrategy;
-    objectTouchStrategy: ObjectTouchReflectionStrategy;
     radius: number;
 
     constructor({ uuid, x, y, dX, dY, color, radius, objectType, eventEmitter }: ICircleRequest) {
@@ -24,7 +20,6 @@ export default class Circle
         this.radius = radius;
         this.drawStrategy = new DrawFullCircleStrategy();
         this.updateStrategy = new UpdateFullCircleStrategy();
-        this.objectTouchStrategy = new ObjectTouchReflectionStrategy();
     }
 }
 

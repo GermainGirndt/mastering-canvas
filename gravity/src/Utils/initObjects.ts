@@ -4,18 +4,29 @@ import { checkIfAnyAreaIsOccupiedByObject, getRandomCoordinates, randomColor, ra
 import { Area, Coordinates } from "../Shared/Interfaces";
 
 function initObjects(): void {
-    if (ObjectStore.storageCount > 15) {
+    if (ObjectStore.storageCount >= 15) {
         alert("Max ball number reached!");
         return;
     }
     ObjectFactory.make({
         objectType: "Circle",
-        x: 50,
-        y: 50,
+        x: 600,
+        y: 600,
         color: randomColor(),
         // radius: randomIntFromRange({ min: 15, max: 30 }),
         radius: 50,
         dX: 2,
+        dY: 2,
+    });
+
+    ObjectFactory.make({
+        objectType: "Circle",
+        x: 770,
+        y: 700,
+        color: randomColor(),
+        // radius: randomIntFromRange({ min: 15, max: 30 }),
+        radius: 50,
+        dX: -2,
         dY: 2,
     });
 }

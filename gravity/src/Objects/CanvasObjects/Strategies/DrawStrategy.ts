@@ -1,31 +1,34 @@
-import { ICircle } from "../Circle";
 import { c } from "../../../Utils/constants";
-
-interface canDraw {
-    draw({}: any): void;
-}
-
+import ObjectStore from "../../ObjectStore";
+import { IMakeableObject } from "../../ObjectStore/ObjectFactory";
 interface hasDrawStrategy {
-    drawStrategy: canDraw;
+    drawStrategy: BaseDrawStrategy;
 }
 
 abstract class BaseDrawStrategy {
-    public draw(input: any) {
-        this.applyDrawStrategy(input);
+    object: IMakeableObject;
+
+    public apply({ uuid, objectType }: any) {
+        this.object = ObjectStore.get({ uuid, objectType });
+        this.applyDrawStrategy();
     }
 
-    protected abstract applyDrawStrategy(input: any): void;
+    protected abstract applyDrawStrategy(): void;
 }
 
-class DrawFullCircleStrategy extends BaseDrawStrategy implements canDraw {
-    protected applyDrawStrategy({ x, y, radius, color }: ICircle): void {
+class DrawFullCircleStrategy extends BaseDrawStrategy {
+    protected applyDrawStrategy(): void {
+        const x = this.object.x + this.object.dX;
+        const y = this.object.y + this.object.dY;
         c.beginPath();
-        c.arc(x, y, radius, 0, Math.PI * 2, false);
-        c.fillStyle = color;
+        c.arc(x, y, this.object.radius, 0, Math.PI * 2, false);
+        c.fillStyle = this.object.color;
         c.fill();
         c.closePath();
         c.isPointInPath;
+
+        ObjectStore.update({ uuid: this.object.uuid, objectType: this.object.objectType, x, y });
     }
 }
 
-export { hasDrawStrategy, canDraw, BaseDrawStrategy, DrawFullCircleStrategy };
+export { BaseDrawStrategy, hasDrawStrategy, DrawFullCircleStrategy };

@@ -1,9 +1,8 @@
 import { randomColor, randomIntFromRange, calcDistance } from "../../../Utils/functions";
-import { ICircle } from "../Circle";
-import { BaseDrawStrategy, DrawFullCircleStrategy } from "./DrawStrategy";
-import { EventEmitter } from "@angular/core";
-import { BaseBorderTouchStrategy, BorderTouchReflectionStrategy } from "./BorderTouchStrategy";
-import { BaseObjectTouchStrategy } from "./ObjectTouchStrategy";
+import { BaseDrawStrategy, DrawFullCircleStrategy, hasDrawStrategy } from "./DrawStrategy";
+import { BaseBorderTouchStrategy, BorderTouchReflectionStrategy, hasBorderTouchStrategy } from "./BorderTouchStrategy";
+import { BaseObjectTouchStrategy, hasObjectTouchStrategy, ObjectTouchReflectionStrategy } from "./ObjectTouchStrategy";
+import { IMakeableObject } from "../../ObjectStore/ObjectFactory";
 
 interface canUpdate {
     update({}: any): void;
@@ -13,69 +12,33 @@ interface hasUpdateStrategy {
     updateStrategy: canUpdate;
 }
 
-abstract class BaseUpdateStrategy implements canUpdate {
-    eventEmitter: EventEmitter<any>;
+abstract class BaseUpdateStrategy
+    implements canUpdate, hasDrawStrategy, hasBorderTouchStrategy, hasObjectTouchStrategy {
+    object: IMakeableObject;
     drawStrategy: BaseDrawStrategy;
-    uuid: string;
-    x: number;
-    y: number;
-    radius: number;
-    dY: number;
-    dX: number;
-    color: string;
     borderTouchStrategy: BaseBorderTouchStrategy;
     objectTouchStrategy: BaseObjectTouchStrategy;
 
-    public update(objectProperties: ICircle): void {
-        this.updateStrategyProperties(objectProperties);
-        this.drawStrategy.draw(objectProperties);
+    protected abstract applyUpdateStrategy({ uuid, objectType }: any): void;
 
-        this.applyUpdateStrategy();
-
-        const { eventEmitter } = objectProperties;
-
-        eventEmitter.emit({
-            x: this.x + this.dX,
-            y: this.y + this.dY,
-            radius: this.radius,
-            color: this.color,
-        });
+    public update({ uuid, objectType }: any): void {
+        this.applyUpdateStrategy({ uuid, objectType });
     }
-
-    private updateStrategyProperties(objectProperties: any): void {
-        Object.assign(this, objectProperties);
-    }
-
-    protected abstract applyUpdateStrategy(): void;
 }
 
 class UpdateFullCircleStrategy extends BaseUpdateStrategy {
     constructor() {
         super();
-        this.borderTouchStrategy = new BorderTouchReflectionStrategy();
         this.drawStrategy = new DrawFullCircleStrategy();
-        this.dY = 2;
-        this.dX = 2;
-        this.color = randomColor();
+        this.borderTouchStrategy = new BorderTouchReflectionStrategy();
+        this.objectTouchStrategy = new ObjectTouchReflectionStrategy();
     }
 
-    protected applyUpdateStrategy(): void {
-        this.applyBorderChangeStrategy();
-        this.applyObjectReflectStrategy();
-    }
-
-    private applyBorderChangeStrategy() {
-        const changesByBorderTouch = this.borderTouchStrategy.applyBorderTouchStrategy(this);
-        if (changesByBorderTouch) {
-            Object.assign(this, changesByBorderTouch);
-        }
-    }
-
-    private applyObjectReflectStrategy() {
-        const changesByObjectTouch = this.objectTouchStrategy.applyObjectTouchStrategy(this);
-        if (changesByObjectTouch) {
-            Object.assign(this, changesByObjectTouch);
-        }
+    protected applyUpdateStrategy({ uuid, objectType }: any): void {
+        // movement strategy
+        this.drawStrategy.apply({ uuid, objectType });
+        this.borderTouchStrategy.apply({ uuid, objectType });
+        this.objectTouchStrategy.apply({ uuid, objectType });
     }
 }
 

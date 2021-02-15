@@ -1,9 +1,8 @@
 import { EventEmitter } from "@angular/core";
 import { MakeableObjectType } from "../ObjectStore/ObjectFactory";
-import { canDraw } from "./Strategies/DrawStrategy";
 import { canUpdate } from "./Strategies/UpdateStrategy";
 
-interface ICanvasObject extends ICanvasObjectRequest, canDraw, canUpdate {
+interface ICanvasObject extends ICanvasObjectRequest, canUpdate {
     draw(): void;
     update(): void;
 }
@@ -29,9 +28,11 @@ export default abstract class CanvasObject implements ICanvasObject {
     objectType: MakeableObjectType;
     eventEmitter: EventEmitter<any>;
 
-    constructor({ x, y, color, uuid, objectType, eventEmitter }: ICanvasObjectRequest) {
+    constructor({ x, dX, y, dY, color, uuid, objectType, eventEmitter }: ICanvasObjectRequest) {
         this.x = x;
+        this.dX = dX;
         this.y = y;
+        this.dY = dY;
         this.color = color;
         this.uuid = uuid;
         this.objectType = objectType;
@@ -44,12 +45,12 @@ export default abstract class CanvasObject implements ICanvasObject {
 
     public draw() {
         //@ts-ignore -> beeing implemented by child
-        this.drawStrategy.draw(this);
+        this.drawStrategy.apply({ uuid: this.uuid, objectType: this.objectType });
     }
 
     public update() {
         //@ts-ignore -> beeing implemented by child
-        this.updateStrategy.update(this);
+        this.updateStrategy.update({ uuid: this.uuid, objectType: this.objectType });
     }
 
     private resetObjectProperties(props: any) {

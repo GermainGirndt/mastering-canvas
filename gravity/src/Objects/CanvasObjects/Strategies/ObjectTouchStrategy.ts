@@ -1,15 +1,12 @@
+import animationController from "../../../Utils/animationController";
 import { randomColor, randomIntFromRange, calcDistance } from "../../../Utils/functions";
 import ObjectStore from "../../ObjectStore";
+import { IMakeableObject } from "../../ObjectStore/ObjectFactory";
 import { ICanvasObject } from "../CanvasObject";
 
-interface canTouchObject {
-    applyObjectTouchStrategy({}: any): void;
-}
-
 interface hasObjectTouchStrategy {
-    objectTouchStrategy: canTouchObject;
+    objectTouchStrategy: BaseObjectTouchStrategy;
 }
-
 interface ChangesByObjectTouch {
     x?: number;
     y?: number;
@@ -29,32 +26,25 @@ interface applyObjectTouchStrategyRequest {
 }
 
 abstract class BaseObjectTouchStrategy {
-    protected uuid: string;
-    protected color: string;
-    protected x: number;
-    protected y: number;
-    protected radius: number;
-    protected dY: number;
-    protected dX: number;
+    protected object: IMakeableObject;
+
     protected circleTouching: ICanvasObject | null;
 
-    public applyObjectTouchStrategy(object: applyObjectTouchStrategyRequest): ChangesByObjectTouch | undefined {
-        Object.assign(this, object);
-        const changesByObjectTouch = this.applyObjectTouchConcreteStrategy();
-
-        return changesByObjectTouch;
+    public apply({ uuid, objectType }: any): void {
+        this.object = ObjectStore.get({ uuid, objectType });
+        this.applyObjectTouchStrategy();
     }
-
-    protected abstract applyObjectTouchConcreteStrategy(): ChangesByObjectTouch | undefined;
+    protected abstract applyObjectTouchStrategy(): void;
 
     protected checkIfObjectsTouch(): boolean {
         const circles = ObjectStore.getAllFromType({ objectType: "Circle" });
         const circleTouching = circles.find(({ x, y, radius, uuid }) => {
-            if (uuid === this.uuid) {
+            if (uuid === this.object.uuid) {
                 return false;
             }
-            const distanceBetweenCircles = calcDistance({ x1: this.x, y1: this.y, x2: x, y2: y });
-            const radiusSum = this.radius + radius;
+            const distanceBetweenCircles = calcDistance({ x1: this.object.x, y1: this.object.y, x2: x, y2: y });
+            const radiusSum = this.object.radius + radius;
+            console.log(`Distance between circles ${distanceBetweenCircles}`);
 
             const areObjectTouching = distanceBetweenCircles <= radiusSum;
             return areObjectTouching;
@@ -66,13 +56,21 @@ abstract class BaseObjectTouchStrategy {
     }
 }
 
-class ObjectTouchReflectionStrategy extends BaseObjectTouchStrategy implements canTouchObject {
-    protected applyObjectTouchConcreteStrategy(): ChangesByObjectTouch | undefined {
+class ObjectTouchReflectionStrategy extends BaseObjectTouchStrategy {
+    protected applyObjectTouchStrategy(): void {
         if (this.checkIfObjectsTouch()) {
-            return { dY: -this.dY, dX: -this.dX, color: randomColor(this.color) };
+            console.log("Objects touched!");
+            animationController.debug();
+
+            const propertiesToUpdate: any = {
+                dY: -this.object.dY,
+                dX: -this.object.dX,
+                color: randomColor(this.object.color),
+            };
+
+            ObjectStore.update({ uuid: this.object.uuid, objectType: this.object.objectType, ...propertiesToUpdate });
         }
-        return undefined;
     }
 }
 
-export { canTouchObject, hasObjectTouchStrategy, BaseObjectTouchStrategy, ObjectTouchReflectionStrategy };
+export { BaseObjectTouchStrategy, hasObjectTouchStrategy, ObjectTouchReflectionStrategy };

@@ -72,8 +72,6 @@ export default class ObjectStore {
     public static getAllInCoordinates({ x, y }: Coordinates): Array<IMakeableObject> {
         const objects = this.getAllAsArray();
 
-        console.log({ x, y });
-
         const allObjectsInCoordinates = objects.filter(object => {
             const isObjectInArea = checkIfCoordinatesAreInArea({
                 x,
@@ -132,5 +130,10 @@ export default class ObjectStore {
         objectsToDeleteArray.forEach(object => {
             this.delete(object);
         });
+    }
+
+    public static removeAll(): void {
+        this.storage = {};
+        this.storageCount = 0;
     }
 }

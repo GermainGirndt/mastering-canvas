@@ -1,11 +1,9 @@
 import { randomColor, randomIntFromRange, calcDistance } from "../../../Utils/functions";
-
-interface canTouchBorder {
-    applyBorderTouchStrategy({}: any): void;
-}
+import ObjectStore from "../../ObjectStore";
+import { IMakeableObject } from "../../ObjectStore/ObjectFactory";
 
 interface hasBorderTouchStrategy {
-    crossingBorderStrategy: canTouchBorder;
+    borderTouchStrategy: BaseBorderTouchStrategy;
 }
 
 interface ChangesByBorderTouch {
@@ -27,12 +25,7 @@ interface applyBorderTouchStrategyRequest {
 }
 
 abstract class BaseBorderTouchStrategy {
-    protected x: number;
-    protected y: number;
-    protected radius: number;
-    protected dY: number;
-    protected dX: number;
-    protected color: string;
+    protected object: IMakeableObject;
 
     protected isAnyBorderBeeingCrossed: boolean;
     protected isXBorderBeeingCrossed: boolean;
@@ -42,14 +35,12 @@ abstract class BaseBorderTouchStrategy {
     protected isLeftBorderBeeingCrossed: boolean;
     protected isRightBorderBeeingCrossed: boolean;
 
-    public applyBorderTouchStrategy(object: applyBorderTouchStrategyRequest): ChangesByBorderTouch | undefined {
-        Object.assign(this, object);
-        const changesByBorderTouch = this.applyBorderTouchConcreteStrategy();
-
-        return changesByBorderTouch;
+    public apply({ uuid, objectType }: any): void {
+        this.object = ObjectStore.get({ uuid, objectType });
+        this.applyConcreteStrategy();
     }
 
-    protected abstract applyBorderTouchConcreteStrategy(): ChangesByBorderTouch | undefined;
+    protected abstract applyConcreteStrategy(): void;
 
     protected checkIfAnyBorderIsBeeingCrossedInTheNextFrame(): boolean {
         this.isAnyBorderBeeingCrossed =
@@ -72,51 +63,52 @@ abstract class BaseBorderTouchStrategy {
     }
 
     protected checkIfBottomBorderIsBeeingCrossedInTheNextFrame(): boolean {
-        this.isBottomBorderBeeingCrossed = this.y + this.dY + this.radius > innerHeight;
+        this.isBottomBorderBeeingCrossed = this.object.y + this.object.dY + this.object.radius > innerHeight;
         return this.isBottomBorderBeeingCrossed;
     }
 
     protected checkIfTopBorderIsBeeingCrossedInTheNextFrame(): boolean {
-        this.isTopBorderBeeingCrossed = this.y + this.dY - this.radius < 0;
+        this.isTopBorderBeeingCrossed = this.object.y + this.object.dY - this.object.radius < 0;
         return this.isTopBorderBeeingCrossed;
     }
 
     protected checkIfLeftBorderIsBeeingCrossedInTheNextFrame(): boolean {
-        this.isLeftBorderBeeingCrossed = this.x + this.dX - this.radius < 0;
+        this.isLeftBorderBeeingCrossed = this.object.x + this.object.dX - this.object.radius < 0;
         return this.isLeftBorderBeeingCrossed;
     }
 
     protected checkIfRightBorderIsBeeingCrossedInTheNextFrame(): boolean {
-        this.isRightBorderBeeingCrossed = this.x + this.dX + this.radius > innerWidth;
+        this.isRightBorderBeeingCrossed = this.object.x + this.object.dX + this.object.radius > innerWidth;
         return this.isRightBorderBeeingCrossed;
     }
 }
 
-class BorderTouchReflectionStrategy extends BaseBorderTouchStrategy implements canTouchBorder {
-    protected applyBorderTouchConcreteStrategy(): ChangesByBorderTouch | undefined {
+class BorderTouchReflectionStrategy extends BaseBorderTouchStrategy {
+    protected applyConcreteStrategy(): void {
         if (this.checkIfAnyBorderIsBeeingCrossedInTheNextFrame()) {
-            console.log("border crossed");
+            let propertiesToUpdate;
             if (this.isYBorderBeeingCrossed) {
                 let y: number;
                 if (this.isTopBorderBeeingCrossed) {
-                    y = 0 + this.radius - this.dY;
+                    y = 0 + this.object.radius - this.object.dY;
                 } else {
-                    y = innerHeight - this.radius - this.dY;
+                    y = innerHeight - this.object.radius - this.object.dY;
                 }
-                return { y, dY: -this.dY, color: randomColor(this.color) };
+                propertiesToUpdate = { y, dY: -this.object.dY, color: randomColor(this.object.color) };
             }
             if (this.isXBorderBeeingCrossed) {
                 let x: number;
                 if (this.isLeftBorderBeeingCrossed) {
-                    x = 0 + this.radius - this.dX;
+                    x = 0 + this.object.radius - this.object.dX;
                 } else {
-                    x = innerWidth - this.radius - this.dX;
+                    x = innerWidth - this.object.radius - this.object.dX;
                 }
-                return { x, dX: -this.dX, color: randomColor(this.color) };
+                propertiesToUpdate = { x, dX: -this.object.dX, color: randomColor(this.object.color) };
             }
+
+            ObjectStore.update({ uuid: this.object.uuid, objectType: this.object.objectType, ...propertiesToUpdate });
         }
-        return undefined;
     }
 }
 
-export { canTouchBorder, hasBorderTouchStrategy, BaseBorderTouchStrategy, BorderTouchReflectionStrategy };
+export { BaseBorderTouchStrategy, hasBorderTouchStrategy, BorderTouchReflectionStrategy };
