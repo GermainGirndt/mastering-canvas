@@ -42,51 +42,49 @@ abstract class BaseBorderTouchStrategy {
 
     protected abstract applyConcreteStrategy(): void;
 
-    protected checkIfAnyBorderIsBeeingCrossedInTheNextFrame(): boolean {
-        this.isAnyBorderBeeingCrossed =
-            this.checkIfYBorderIsBeingCrossedInTheNextFrame() || this.checkIfXBorderIsBeeingCrossedInTheNextFrame();
+    protected checkIfAnyBorderIsBeeingCrossed(): boolean {
+        this.isAnyBorderBeeingCrossed = this.checkIfYBorderIsBeingCrossed() || this.checkIfXBorderIsBeeingCrossed();
         return this.isAnyBorderBeeingCrossed;
     }
 
-    protected checkIfYBorderIsBeingCrossedInTheNextFrame(): boolean {
+    protected checkIfYBorderIsBeingCrossed(): boolean {
         this.isYBorderBeeingCrossed =
-            this.checkIfBottomBorderIsBeeingCrossedInTheNextFrame() ||
-            this.checkIfTopBorderIsBeeingCrossedInTheNextFrame();
+            this.checkIfBottomBorderIsBeeingCrossed() || this.checkIfTopBorderIsBeeingCrossed();
         return this.isYBorderBeeingCrossed;
     }
 
-    protected checkIfXBorderIsBeeingCrossedInTheNextFrame(): boolean {
+    protected checkIfXBorderIsBeeingCrossed(): boolean {
         this.isXBorderBeeingCrossed =
-            this.checkIfLeftBorderIsBeeingCrossedInTheNextFrame() ||
-            this.checkIfRightBorderIsBeeingCrossedInTheNextFrame();
+            this.checkIfLeftBorderIsBeeingCrossed() || this.checkIfRightBorderIsBeeingCrossed();
         return this.isXBorderBeeingCrossed;
     }
 
-    protected checkIfBottomBorderIsBeeingCrossedInTheNextFrame(): boolean {
-        this.isBottomBorderBeeingCrossed = this.object.y + this.object.dY + this.object.radius > innerHeight;
+    protected checkIfBottomBorderIsBeeingCrossed(): boolean {
+        this.isBottomBorderBeeingCrossed = this.object.y + this.object.radius > innerHeight;
         return this.isBottomBorderBeeingCrossed;
     }
 
-    protected checkIfTopBorderIsBeeingCrossedInTheNextFrame(): boolean {
-        this.isTopBorderBeeingCrossed = this.object.y + this.object.dY - this.object.radius < 0;
+    protected checkIfTopBorderIsBeeingCrossed(): boolean {
+        this.isTopBorderBeeingCrossed = this.object.y - this.object.radius < 0;
         return this.isTopBorderBeeingCrossed;
     }
 
-    protected checkIfLeftBorderIsBeeingCrossedInTheNextFrame(): boolean {
-        this.isLeftBorderBeeingCrossed = this.object.x + this.object.dX - this.object.radius < 0;
+    protected checkIfLeftBorderIsBeeingCrossed(): boolean {
+        this.isLeftBorderBeeingCrossed = this.object.x - this.object.radius < 0;
         return this.isLeftBorderBeeingCrossed;
     }
 
-    protected checkIfRightBorderIsBeeingCrossedInTheNextFrame(): boolean {
-        this.isRightBorderBeeingCrossed = this.object.x + this.object.dX + this.object.radius > innerWidth;
+    protected checkIfRightBorderIsBeeingCrossed(): boolean {
+        this.isRightBorderBeeingCrossed = this.object.x + this.object.radius > innerWidth;
         return this.isRightBorderBeeingCrossed;
     }
 }
 
 class BorderTouchReflectionStrategy extends BaseBorderTouchStrategy {
     protected applyConcreteStrategy(): void {
-        if (this.checkIfAnyBorderIsBeeingCrossedInTheNextFrame()) {
-            let propertiesToUpdate;
+        if (this.checkIfAnyBorderIsBeeingCrossed()) {
+            let propertiesToUpdate = {};
+
             if (this.isYBorderBeeingCrossed) {
                 let y: number;
                 if (this.isTopBorderBeeingCrossed) {
@@ -94,8 +92,9 @@ class BorderTouchReflectionStrategy extends BaseBorderTouchStrategy {
                 } else {
                     y = innerHeight - this.object.radius - this.object.dY;
                 }
-                propertiesToUpdate = { y, dY: -this.object.dY, color: randomColor(this.object.color) };
+                Object.assign(propertiesToUpdate, { y, dY: -this.object.dY });
             }
+
             if (this.isXBorderBeeingCrossed) {
                 let x: number;
                 if (this.isLeftBorderBeeingCrossed) {
@@ -103,8 +102,10 @@ class BorderTouchReflectionStrategy extends BaseBorderTouchStrategy {
                 } else {
                     x = innerWidth - this.object.radius - this.object.dX;
                 }
-                propertiesToUpdate = { x, dX: -this.object.dX, color: randomColor(this.object.color) };
+                Object.assign(propertiesToUpdate, { x, dX: -this.object.dX });
             }
+
+            Object.assign(propertiesToUpdate, { color: randomColor(this.object.color) });
 
             ObjectStore.update({ uuid: this.object.uuid, objectType: this.object.objectType, ...propertiesToUpdate });
         }

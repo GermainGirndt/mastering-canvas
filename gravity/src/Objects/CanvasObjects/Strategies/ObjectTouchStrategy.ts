@@ -28,7 +28,7 @@ interface applyObjectTouchStrategyRequest {
 abstract class BaseObjectTouchStrategy {
     protected object: IMakeableObject;
 
-    protected circleTouching: ICanvasObject | null;
+    protected objectTouching: ICanvasObject | null;
 
     public apply({ uuid, objectType }: any): void {
         this.object = ObjectStore.get({ uuid, objectType });
@@ -38,21 +38,22 @@ abstract class BaseObjectTouchStrategy {
 
     protected checkIfObjectsTouch(): boolean {
         const circles = ObjectStore.getAllFromType({ objectType: "Circle" });
-        const circleTouching = circles.find(({ x, y, radius, uuid }) => {
+        const objectTouching = circles.find(({ x, y, radius, uuid }) => {
             if (uuid === this.object.uuid) {
                 return false;
             }
             const distanceBetweenCircles = calcDistance({ x1: this.object.x, y1: this.object.y, x2: x, y2: y });
             const radiusSum = this.object.radius + radius;
-            console.log(`Distance between circles ${distanceBetweenCircles}`);
+            //console.log(`Distance between circles ${distanceBetweenCircles}`);
 
-            const areObjectTouching = distanceBetweenCircles <= radiusSum;
+            const areObjectTouching = distanceBetweenCircles < radiusSum;
+            console.log(areObjectTouching);
             return areObjectTouching;
         });
 
-        this.circleTouching = circleTouching ? circleTouching : null;
+        this.objectTouching = objectTouching ? objectTouching : null;
 
-        return circleTouching ? true : false;
+        return objectTouching ? true : false;
     }
 }
 
@@ -60,7 +61,11 @@ class ObjectTouchReflectionStrategy extends BaseObjectTouchStrategy {
     protected applyObjectTouchStrategy(): void {
         if (this.checkIfObjectsTouch()) {
             console.log("Objects touched!");
+            console.log(this.object);
             animationController.debug();
+
+            const angleInRad = this.calculateAngleBetweenCirclesCenter();
+            const { dX, dY } = this.calculateVelocityVectors(angleInRad);
 
             const propertiesToUpdate: any = {
                 dY: -this.object.dY,
@@ -68,8 +73,37 @@ class ObjectTouchReflectionStrategy extends BaseObjectTouchStrategy {
                 color: randomColor(this.object.color),
             };
 
+            console.log("Hypot " + Math.hypot(dY, dX));
+
+            console.log(propertiesToUpdate);
+
             ObjectStore.update({ uuid: this.object.uuid, objectType: this.object.objectType, ...propertiesToUpdate });
         }
+    }
+
+    protected calculateAngleBetweenCirclesCenter(): number {
+        if (!this.objectTouching) {
+            throw new Error("No target object to calculate angle!");
+        }
+        const distanceToTargetX = this.objectTouching.x - this.object.x;
+        const distanceToTargetY = this.objectTouching.y - this.object.y;
+
+        console.log("Distance:");
+        //alert(`${distanceToTargetX}, ${distanceToTargetY}`);
+
+        const angleInRads = Math.atan2(distanceToTargetY, distanceToTargetX);
+
+        const angleInGrads = (angleInRads * 180) / Math.PI;
+        //alert(angleInGrads);
+
+        return angleInRads;
+    }
+
+    protected calculateVelocityVectors(angleInRad: number): any {
+        const dX = Math.cos(angleInRad);
+        const dY = Math.sin(angleInRad);
+
+        return { dX, dY };
     }
 }
 

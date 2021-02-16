@@ -20,7 +20,7 @@ function calcDistance({ x1, y1, x2, y2 }: IDistance) {
     const xDist = x2 - x1;
     const yDist = y2 - y1;
 
-    return Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2));
+    return Math.hypot(xDist, yDist);
 }
 
 interface ICheckIfCoordinatesAreInArea {
