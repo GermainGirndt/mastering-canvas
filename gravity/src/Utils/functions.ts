@@ -1,6 +1,7 @@
 import { ICircle } from "../Objects/CanvasObjects/Circle";
 import { colors } from "./constants";
 import { Area, Coordinates } from "../Shared/Interfaces";
+import { IMakeableObject } from "../Objects/ObjectStore/ObjectFactory";
 
 interface IRandomIntFromRange {
     min: number;
@@ -131,6 +132,52 @@ const debounce = (func: any, wait: any) => {
     };
 };
 
+function rotate({ dX, dY }: any, angle: number) {
+    const rotatedVelocities = {
+        dX: dX * Math.cos(angle) - dY * Math.sin(angle),
+        dY: dX * Math.sin(angle) + dY * Math.cos(angle),
+    };
+
+    return rotatedVelocities;
+}
+
+function resolveCollision(particle: IMakeableObject, otherParticle: IMakeableObject) {
+    const xVelocityDiff = particle.dX - otherParticle.dX;
+    const yVelocityDiff = particle.dY - otherParticle.dY;
+
+    const xDist = otherParticle.x - particle.x;
+    const yDist = otherParticle.y - particle.y;
+
+    // Prevent accidental overlap of particles
+    if (xVelocityDiff * xDist + yVelocityDiff * yDist >= 0) {
+        // Grab angle between the two colliding particles
+        const angle = -Math.atan2(otherParticle.y - particle.y, otherParticle.x - particle.x);
+
+        // Store mass in var for better readability in collision equation
+        const m1 = particle.mass;
+        const m2 = otherParticle.mass;
+
+        // Velocity before equation
+        const u1 = rotate({ dX: particle.dX, dY: particle.dY }, angle);
+        const u2 = rotate({ dX: otherParticle.dX, dY: otherParticle.dY }, angle);
+
+        // Velocity after 1d collision equation
+        const v1 = { dX: (u1.dX * (m1 - m2)) / (m1 + m2) + (u2.dX * 2 * m2) / (m1 + m2), dY: u1.dY };
+        const v2 = { dX: (u2.dX * (m1 - m2)) / (m1 + m2) + (u1.dX * 2 * m2) / (m1 + m2), dY: u2.dY };
+
+        // Final velocity after rotating axis back to original location
+        const vFinal1 = rotate(v1, -angle);
+        const vFinal2 = rotate(v2, -angle);
+
+        // Swap particle velocities for realistic bounce effect
+        particle.dX = vFinal1.dX;
+        particle.dY = vFinal1.dY;
+
+        otherParticle.dX = vFinal2.dX;
+        otherParticle.dY = vFinal2.dY;
+    }
+}
+
 export {
     randomIntFromRange,
     randomColor,
@@ -140,4 +187,6 @@ export {
     checkIfAnyAreaIsOccupiedByObject,
     checkIfObjectsAreOccupingAnyArea,
     debounce,
+    rotate,
+    resolveCollision,
 };

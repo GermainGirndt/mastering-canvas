@@ -14,7 +14,7 @@ const mouse: Coordinates = {
 const colors: any = {
     blue: "#2185C5",
     cianBlue: "#7ECEFD",
-    yellow: "#F2E6E5",
+    black: "#000",
     red: "#FF7F66",
     green: "#9AFF66",
     purple: "#CC66FF",

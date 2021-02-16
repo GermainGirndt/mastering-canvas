@@ -13,6 +13,7 @@ interface ICanvasObjectRequest {
     dX: number;
     y: number;
     dY: number;
+    mass: number;
     color: string;
     objectType: MakeableObjectType;
     eventEmitter: EventEmitter<any>;
@@ -24,15 +25,17 @@ export default abstract class CanvasObject implements ICanvasObject {
     dX: number;
     y: number;
     dY: number;
+    mass: number;
     color: string;
     objectType: MakeableObjectType;
     eventEmitter: EventEmitter<any>;
 
-    constructor({ x, dX, y, dY, color, uuid, objectType, eventEmitter }: ICanvasObjectRequest) {
+    constructor({ x, dX, y, dY, mass, color, uuid, objectType, eventEmitter }: ICanvasObjectRequest) {
         this.x = x;
         this.dX = dX;
         this.y = y;
         this.dY = dY;
+        this.mass = mass;
         this.color = color;
         this.uuid = uuid;
         this.objectType = objectType;

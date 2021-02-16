@@ -12,22 +12,22 @@ function initObjects(): void {
         objectType: "Circle",
         x: 600,
         y: 600,
+        dX: 8,
+        dY: 8,
+        mass: 1,
         color: randomColor(),
-        // radius: randomIntFromRange({ min: 15, max: 30 }),
-        radius: 50,
-        dX: 2,
-        dY: 2,
+        radius: randomIntFromRange({ min: 30, max: 50 }),
     });
 
     ObjectFactory.make({
         objectType: "Circle",
         x: 770,
         y: 700,
-        color: randomColor(),
-        // radius: randomIntFromRange({ min: 15, max: 30 }),
-        radius: 50,
         dX: -2,
         dY: 2,
+        mass: 1,
+        color: randomColor(),
+        radius: randomIntFromRange({ min: 30, max: 50 }),
     });
 }
 
@@ -59,7 +59,8 @@ function callNextFrame(
     objects: Array<IMakeableObject>,
     mouse: Coordinates
 ): void {
-    c.clearRect(0, 0, canvas.width, canvas.height);
+    c.fillStyle = "rgba(255, 255, 255, 0.2)";
+    c.fillRect(0, 0, canvas.width, canvas.height);
     c.fillText("CANVAS", mouse.x, mouse.y);
     objects.forEach(object => {
         object.update();

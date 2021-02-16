@@ -15,8 +15,8 @@ export default class Circle extends CanvasObject implements hasDrawStrategy, has
     updateStrategy: UpdateFullCircleStrategy;
     radius: number;
 
-    constructor({ uuid, x, y, dX, dY, color, radius, objectType, eventEmitter }: ICircleRequest) {
-        super({ uuid, x, y, dX, dY, color, objectType, eventEmitter });
+    constructor({ uuid, x, y, dX, dY, mass, color, radius, objectType, eventEmitter }: ICircleRequest) {
+        super({ uuid, x, y, dX, dY, mass, color, objectType, eventEmitter });
         this.radius = radius;
         this.drawStrategy = new DrawFullCircleStrategy();
         this.updateStrategy = new UpdateFullCircleStrategy();
