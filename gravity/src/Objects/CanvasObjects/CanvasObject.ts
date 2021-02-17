@@ -1,4 +1,5 @@
 import { EventEmitter } from "@angular/core";
+import { Position, Velocity } from "../../Shared/Interfaces";
 import { MakeableObjectType } from "../ObjectStore/ObjectFactory";
 import { canUpdate } from "./Strategies/UpdateStrategy";
 
@@ -9,10 +10,8 @@ interface ICanvasObject extends ICanvasObjectRequest, canUpdate {
 
 interface ICanvasObjectRequest {
     uuid: string;
-    x: number;
-    dX: number;
-    y: number;
-    dY: number;
+    position: Position;
+    velocity: Velocity;
     mass: number;
     color: string;
     objectType: MakeableObjectType;
@@ -21,20 +20,16 @@ interface ICanvasObjectRequest {
 
 export default abstract class CanvasObject implements ICanvasObject {
     uuid: string;
-    x: number;
-    dX: number;
-    y: number;
-    dY: number;
+    position: Position;
+    velocity: Velocity;
     mass: number;
     color: string;
     objectType: MakeableObjectType;
     eventEmitter: EventEmitter<any>;
 
-    constructor({ x, dX, y, dY, mass, color, uuid, objectType, eventEmitter }: ICanvasObjectRequest) {
-        this.x = x;
-        this.dX = dX;
-        this.y = y;
-        this.dY = dY;
+    constructor({ position, velocity, mass, color, uuid, objectType, eventEmitter }: ICanvasObjectRequest) {
+        this.position = position;
+        this.velocity = velocity;
         this.mass = mass;
         this.color = color;
         this.uuid = uuid;

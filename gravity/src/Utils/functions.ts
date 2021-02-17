@@ -1,6 +1,6 @@
 import { ICircle } from "../Objects/CanvasObjects/Circle";
 import { colors } from "./constants";
-import { Area, Coordinates } from "../Shared/Interfaces";
+import { Area, Position } from "../Shared/Interfaces";
 import { IMakeableObject } from "../Objects/ObjectStore/ObjectFactory";
 
 interface IRandomIntFromRange {
@@ -62,10 +62,10 @@ function checkIfCoordinatesAreInArea({
     return !isNotInArea;
 }
 
-function getRandomCoordinates(coordinateRadius: number = 0): Coordinates {
+function getRandomPosition(coordinateRadius: number = 0): Position {
     const x = randomIntFromRange({ min: 0 + coordinateRadius, max: innerWidth - coordinateRadius });
     const y = randomIntFromRange({ min: 0 + coordinateRadius, max: innerHeight - coordinateRadius });
-    return { y, x };
+    return { x, y };
 }
 
 interface ICheckIfAnyAreaIsOccupiedByObject {
@@ -75,23 +75,8 @@ interface ICheckIfAnyAreaIsOccupiedByObject {
 function checkIfAnyAreaIsOccupiedByObject({ areas, object }: ICheckIfAnyAreaIsOccupiedByObject) {
     const isAnyAreaOccupied = areas.some(area => {
         return checkIfCoordinatesAreInArea({
-            x: object.x,
-            y: object.y,
-            coordinateRadius: object.radius,
-            areaRadius: area.radius,
-            areaX: area.x,
-            areaY: area.y,
-        });
-    });
-
-    return isAnyAreaOccupied;
-}
-
-function checkIfObjectsAreOccupingAnyArea({ areas, object }: ICheckIfAnyAreaIsOccupiedByObject) {
-    const isAnyAreaOccupied = areas.some(area => {
-        return checkIfCoordinatesAreInArea({
-            x: object.x,
-            y: object.y,
+            x: object.position.x,
+            y: object.position.y,
             coordinateRadius: object.radius,
             areaRadius: area.radius,
             areaX: area.x,
@@ -145,24 +130,27 @@ function rotate({ dX, dY }: any, angle: number) {
 }
 
 function resolveCollision(particle: IMakeableObject, otherParticle: IMakeableObject) {
-    const xVelocityDiff = particle.dX - otherParticle.dX;
-    const yVelocityDiff = particle.dY - otherParticle.dY;
+    const xVelocityDiff = particle.velocity.dX - otherParticle.velocity.dX;
+    const yVelocityDiff = particle.velocity.dY - otherParticle.velocity.dY;
 
-    const xDist = otherParticle.x - particle.x;
-    const yDist = otherParticle.y - particle.y;
+    const xDist = otherParticle.position.x - particle.position.x;
+    const yDist = otherParticle.position.y - particle.position.y;
 
     // Prevent accidental overlap of particles
     if (xVelocityDiff * xDist + yVelocityDiff * yDist >= 0) {
         // Grab angle between the two colliding particles
-        const angle = -Math.atan2(otherParticle.y - particle.y, otherParticle.x - particle.x);
+        const angle = -Math.atan2(
+            otherParticle.position.y - particle.position.y,
+            otherParticle.position.x - particle.position.x
+        );
 
         // Store mass in var for better readability in collision equation
         const m1 = particle.mass;
         const m2 = otherParticle.mass;
 
         // Velocity before equation
-        const u1 = rotate({ dX: particle.dX, dY: particle.dY }, angle);
-        const u2 = rotate({ dX: otherParticle.dX, dY: otherParticle.dY }, angle);
+        const u1 = rotate({ dX: particle.velocity.dX, dY: particle.velocity.dY }, angle);
+        const u2 = rotate({ dX: otherParticle.velocity.dX, dY: otherParticle.velocity.dY }, angle);
 
         // Velocity after 1d collision equation
         const v1 = { dX: (u1.dX * (m1 - m2)) / (m1 + m2) + (u2.dX * 2 * m2) / (m1 + m2), dY: u1.dY };
@@ -173,11 +161,11 @@ function resolveCollision(particle: IMakeableObject, otherParticle: IMakeableObj
         const vFinal2 = rotate(v2, -angle);
 
         // Swap particle velocities for realistic bounce effect
-        particle.dX = vFinal1.dX;
-        particle.dY = vFinal1.dY;
+        particle.velocity.dX = vFinal1.dX;
+        particle.velocity.dY = vFinal1.dY;
 
-        otherParticle.dX = vFinal2.dX;
-        otherParticle.dY = vFinal2.dY;
+        otherParticle.velocity.dX = vFinal2.dX;
+        otherParticle.velocity.dY = vFinal2.dY;
     }
 }
 
@@ -186,9 +174,8 @@ export {
     randomColor,
     calcDistance,
     checkIfCoordinatesAreInArea,
-    getRandomCoordinates,
+    getRandomPosition,
     checkIfAnyAreaIsOccupiedByObject,
-    checkIfObjectsAreOccupingAnyArea,
     debounce,
     rotate,
     resolveCollision,

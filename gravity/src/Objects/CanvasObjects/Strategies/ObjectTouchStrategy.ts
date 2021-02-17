@@ -39,11 +39,18 @@ abstract class BaseObjectTouchStrategy {
 
     protected checkIfObjectsTouch(): boolean {
         const circles = ObjectStore.getAllFromType({ objectType: "Circle" });
-        const objectTouching = circles.find(({ x, y, radius, uuid }) => {
+        const objectTouching = circles.find(({ position, radius, uuid }) => {
             if (uuid === this.object.uuid) {
                 return false;
             }
-            const distanceBetweenCircles = calcDistance({ x1: this.object.x, y1: this.object.y, x2: x, y2: y });
+
+            const { x, y } = position;
+            const distanceBetweenCircles = calcDistance({
+                x1: this.object.position.x,
+                y1: this.object.position.y,
+                x2: x,
+                y2: y,
+            });
             const radiusSum = this.object.radius + radius;
 
             const areObjectTouching = distanceBetweenCircles < radiusSum;

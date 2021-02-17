@@ -18,8 +18,8 @@ abstract class BaseDrawStrategy {
 
 class DrawFullCircleStrategy extends BaseDrawStrategy {
     protected applyDrawStrategy(): void {
-        const x = this.object.x + this.object.dX;
-        const y = this.object.y + this.object.dY;
+        const x = this.object.position.x + this.object.velocity.dX;
+        const y = this.object.position.y + this.object.velocity.dY;
         c.beginPath();
         c.arc(x, y, this.object.radius, 0, Math.PI * 2, false);
         c.fillStyle = this.object.color;
@@ -27,7 +27,7 @@ class DrawFullCircleStrategy extends BaseDrawStrategy {
         c.closePath();
         c.isPointInPath;
 
-        ObjectStore.update({ uuid: this.object.uuid, objectType: this.object.objectType, x, y });
+        ObjectStore.update({ uuid: this.object.uuid, objectType: this.object.objectType, position: { x, y } });
     }
 }
 

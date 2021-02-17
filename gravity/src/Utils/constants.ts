@@ -1,4 +1,4 @@
-import { Coordinates } from "../Shared/Interfaces";
+import { Position } from "../Shared/Interfaces";
 
 const canvas = document.querySelector("canvas") as HTMLCanvasElement;
 const c = canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -6,7 +6,7 @@ const c = canvas.getContext("2d") as CanvasRenderingContext2D;
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
-const mouse: Coordinates = {
+const mouse: Position = {
     x: innerWidth / 2,
     y: innerHeight / 2,
 };

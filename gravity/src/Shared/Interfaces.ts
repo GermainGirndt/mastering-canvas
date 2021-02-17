@@ -1,4 +1,8 @@
-interface Coordinates {
+interface Velocity {
+    dX: number;
+    dY: number;
+}
+interface Position {
     x: number;
     y: number;
 }
@@ -8,4 +12,4 @@ interface Area {
     radius: number;
 }
 
-export { Coordinates, Area };
+export { Position, Area, Velocity };

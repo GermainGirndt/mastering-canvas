@@ -8,7 +8,7 @@ import {
     IGetAllRequest,
     IUpdateRequest,
 } from "./Interfaces";
-import { Coordinates } from "../../Shared/Interfaces";
+import { Position } from "../../Shared/Interfaces";
 import { checkIfCoordinatesAreInArea } from "../../Utils/functions";
 export default class ObjectStore {
     constructor() {}
@@ -69,15 +69,15 @@ export default class ObjectStore {
         return objects;
     }
 
-    public static getAllInCoordinates({ x, y }: Coordinates): Array<IMakeableObject> {
+    public static getAllInCoordinates({ x, y }: Position): Array<IMakeableObject> {
         const objects = this.getAllAsArray();
 
         const allObjectsInCoordinates = objects.filter(object => {
             const isObjectInArea = checkIfCoordinatesAreInArea({
                 x,
                 y,
-                areaX: object.x,
-                areaY: object.y,
+                areaX: object.position.x,
+                areaY: object.position.y,
                 areaRadius: object.radius,
             });
             return isObjectInArea;

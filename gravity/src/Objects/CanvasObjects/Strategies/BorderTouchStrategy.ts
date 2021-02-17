@@ -60,22 +60,22 @@ abstract class BaseBorderTouchStrategy {
     }
 
     protected checkIfBottomBorderIsBeeingCrossed(): boolean {
-        this.isBottomBorderBeeingCrossed = this.object.y + this.object.radius > innerHeight;
+        this.isBottomBorderBeeingCrossed = this.object.position.y + this.object.radius > innerHeight;
         return this.isBottomBorderBeeingCrossed;
     }
 
     protected checkIfTopBorderIsBeeingCrossed(): boolean {
-        this.isTopBorderBeeingCrossed = this.object.y - this.object.radius < 0;
+        this.isTopBorderBeeingCrossed = this.object.position.y - this.object.radius < 0;
         return this.isTopBorderBeeingCrossed;
     }
 
     protected checkIfLeftBorderIsBeeingCrossed(): boolean {
-        this.isLeftBorderBeeingCrossed = this.object.x - this.object.radius < 0;
+        this.isLeftBorderBeeingCrossed = this.object.position.x - this.object.radius < 0;
         return this.isLeftBorderBeeingCrossed;
     }
 
     protected checkIfRightBorderIsBeeingCrossed(): boolean {
-        this.isRightBorderBeeingCrossed = this.object.x + this.object.radius > innerWidth;
+        this.isRightBorderBeeingCrossed = this.object.position.x + this.object.radius > innerWidth;
         return this.isRightBorderBeeingCrossed;
     }
 }
@@ -83,26 +83,32 @@ abstract class BaseBorderTouchStrategy {
 class BorderTouchReflectionStrategy extends BaseBorderTouchStrategy {
     protected applyConcreteStrategy(): void {
         if (this.checkIfAnyBorderIsBeeingCrossed()) {
-            let propertiesToUpdate = {};
+            let propertiesToUpdate = { position: this.object.position, velocity: this.object.velocity };
 
             if (this.isYBorderBeeingCrossed) {
                 let y: number;
                 if (this.isTopBorderBeeingCrossed) {
-                    y = 0 + this.object.radius - this.object.dY;
+                    y = 0 + this.object.radius - this.object.velocity.dY;
                 } else {
-                    y = innerHeight - this.object.radius - this.object.dY;
+                    y = innerHeight - this.object.radius - this.object.velocity.dY;
                 }
-                Object.assign(propertiesToUpdate, { y, dY: -this.object.dY });
+                Object.assign(propertiesToUpdate, {
+                    position: { ...propertiesToUpdate.position, y },
+                    velocity: { ...propertiesToUpdate.velocity, dY: -this.object.velocity.dY },
+                });
             }
 
             if (this.isXBorderBeeingCrossed) {
                 let x: number;
                 if (this.isLeftBorderBeeingCrossed) {
-                    x = 0 + this.object.radius - this.object.dX;
+                    x = 0 + this.object.radius - this.object.velocity.dX;
                 } else {
-                    x = innerWidth - this.object.radius - this.object.dX;
+                    x = innerWidth - this.object.radius - this.object.velocity.dX;
                 }
-                Object.assign(propertiesToUpdate, { x, dX: -this.object.dX });
+                Object.assign(propertiesToUpdate, {
+                    position: { ...propertiesToUpdate.position, x },
+                    velocity: { ...propertiesToUpdate.velocity, dX: -this.object.velocity.dX },
+                });
             }
 
             Object.assign(propertiesToUpdate, { color: randomColor(this.object.color) });
