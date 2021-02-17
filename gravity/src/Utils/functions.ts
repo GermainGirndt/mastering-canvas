@@ -133,9 +133,12 @@ const debounce = (func: any, wait: any) => {
 };
 
 function rotate({ dX, dY }: any, angle: number) {
+    const cosAngle = Math.cos(angle);
+    const sinAngle = Math.sin(angle);
+
     const rotatedVelocities = {
-        dX: dX * Math.cos(angle) - dY * Math.sin(angle),
-        dY: dX * Math.sin(angle) + dY * Math.cos(angle),
+        dX: dX * cosAngle - dY * sinAngle,
+        dY: dX * sinAngle + dY * cosAngle,
     };
 
     return rotatedVelocities;

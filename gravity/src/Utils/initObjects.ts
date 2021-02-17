@@ -5,7 +5,6 @@ import { Area, Coordinates } from "../Shared/Interfaces";
 
 function initObjects(): void {
     if (ObjectStore.storageCount >= 15) {
-        alert("Max ball number reached!");
         return;
     }
     ObjectFactory.make({
