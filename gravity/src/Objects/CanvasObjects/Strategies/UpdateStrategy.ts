@@ -3,6 +3,8 @@ import { BaseDrawStrategy, DrawFullCircleStrategy, hasDrawStrategy } from "./Dra
 import { BaseBorderTouchStrategy, BorderTouchReflectionStrategy, hasBorderTouchStrategy } from "./BorderTouchStrategy";
 import { BaseObjectTouchStrategy, hasObjectTouchStrategy, ObjectTouchReflectionStrategy } from "./ObjectTouchStrategy";
 import { IMakeableObject } from "../../ObjectStore/ObjectFactory";
+import { ICanvasObject } from "../CanvasObject";
+import { ICircle } from "../Circle";
 
 interface canUpdate {
     update({}: any): void;
@@ -21,8 +23,8 @@ abstract class BaseUpdateStrategy
 
     protected abstract applyUpdateStrategy({ uuid, objectType }: any): void;
 
-    public update({ uuid, objectType }: any): void {
-        this.applyUpdateStrategy({ uuid, objectType });
+    public update(object: ICircle): void {
+        this.applyUpdateStrategy(object);
     }
 }
 
@@ -34,11 +36,11 @@ class UpdateFullCircleStrategy extends BaseUpdateStrategy {
         this.objectTouchStrategy = new ObjectTouchReflectionStrategy();
     }
 
-    protected applyUpdateStrategy({ uuid, objectType }: any): void {
+    protected applyUpdateStrategy(object: IMakeableObject): void {
         // movement strategy
-        this.drawStrategy.apply({ uuid, objectType });
-        this.borderTouchStrategy.apply({ uuid, objectType });
-        this.objectTouchStrategy.apply({ uuid, objectType });
+        this.drawStrategy.apply(object);
+        this.borderTouchStrategy.apply(object);
+        this.objectTouchStrategy.apply(object);
     }
 }
 

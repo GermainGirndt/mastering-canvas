@@ -55,6 +55,7 @@ function eventListeners() {
             canvas.width = innerWidth;
             canvas.height = innerHeight;
             relocateObjectsOnScreen();
+            console.log("Relocated");
         }, 200)
     );
 

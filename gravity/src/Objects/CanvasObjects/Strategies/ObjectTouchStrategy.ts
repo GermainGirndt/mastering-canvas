@@ -1,38 +1,18 @@
-import animationController from "../../../Utils/animationController";
-import { randomColor, randomIntFromRange, calcDistance, resolveCollision } from "../../../Utils/functions";
+import { randomColor, calcDistance, resolveCollision } from "../../../Utils/functions";
 import ObjectStore from "../../ObjectStore";
 import { IMakeableObject } from "../../ObjectStore/ObjectFactory";
-import { ICanvasObject } from "../CanvasObject";
 import { ICircle } from "../Circle";
 
 interface hasObjectTouchStrategy {
     objectTouchStrategy: BaseObjectTouchStrategy;
 }
-interface ChangesByObjectTouch {
-    x?: number;
-    y?: number;
-    radius?: number;
-    dY?: number;
-    dX?: number;
-    color: string;
-}
-
-interface applyObjectTouchStrategyRequest {
-    x: number;
-    y: number;
-    uuid: string;
-    radius: number;
-    dY: number;
-    dX: number;
-}
-
 abstract class BaseObjectTouchStrategy {
     protected object: IMakeableObject;
 
     protected objectTouching: ICircle | null;
 
-    public apply({ uuid, objectType }: any): void {
-        this.object = ObjectStore.get({ uuid, objectType });
+    public apply(object: IMakeableObject): void {
+        this.object = object;
         this.applyObjectTouchStrategy();
     }
     protected abstract applyObjectTouchStrategy(): void;

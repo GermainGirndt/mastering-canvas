@@ -43,12 +43,12 @@ export default abstract class CanvasObject implements ICanvasObject {
 
     public draw() {
         //@ts-ignore -> beeing implemented by child
-        this.drawStrategy.apply({ uuid: this.uuid, objectType: this.objectType });
+        this.drawStrategy.apply(this);
     }
 
     public update() {
         //@ts-ignore -> beeing implemented by child
-        this.updateStrategy.update({ uuid: this.uuid, objectType: this.objectType });
+        this.updateStrategy.update(this);
     }
 
     private resetObjectProperties(props: any) {

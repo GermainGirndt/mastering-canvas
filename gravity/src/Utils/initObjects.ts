@@ -4,7 +4,8 @@ import { checkIfAnyAreaIsOccupiedByObject, getRandomPosition, randomColor, rando
 import { Area, Position } from "../Shared/Interfaces";
 
 function initObjects(): void {
-    if (ObjectStore.storageCount >= 15) {
+    const maxObjectsNumber = 20;
+    if (ObjectStore.storageCount >= maxObjectsNumber) {
         return;
     }
     ObjectFactory.make({
@@ -30,7 +31,7 @@ function relocateObjectsOnScreen(): void {
     const objects: Array<IMakeableObject> = ObjectStore.getAllAsArray();
 
     const areasAlreadyOccupied: Array<Area> = [];
-    const maxTries: number = 20000;
+    const maxTries: number = 30000;
 
     objects.forEach(object => {
         let newPosition: Position;

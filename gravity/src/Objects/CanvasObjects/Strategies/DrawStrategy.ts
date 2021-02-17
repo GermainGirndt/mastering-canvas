@@ -1,5 +1,4 @@
 import { c } from "../../../Utils/constants";
-import ObjectStore from "../../ObjectStore";
 import { IMakeableObject } from "../../ObjectStore/ObjectFactory";
 interface hasDrawStrategy {
     drawStrategy: BaseDrawStrategy;
@@ -8,8 +7,8 @@ interface hasDrawStrategy {
 abstract class BaseDrawStrategy {
     object: IMakeableObject;
 
-    public apply({ uuid, objectType }: any) {
-        this.object = ObjectStore.get({ uuid, objectType });
+    public apply(object: IMakeableObject) {
+        this.object = object;
         this.applyDrawStrategy();
     }
 
@@ -27,7 +26,9 @@ class DrawFullCircleStrategy extends BaseDrawStrategy {
         c.closePath();
         c.isPointInPath;
 
-        ObjectStore.update({ uuid: this.object.uuid, objectType: this.object.objectType, position: { x, y } });
+        const newPosition = { x, y };
+
+        Object.assign(this.object.position, newPosition);
     }
 }
 
